@@ -1,0 +1,18 @@
+Source: sonic-cps-api
+Section: net
+Priority: optional
+Maintainer: Dell <support@dell.com>
+Build-Depends: debhelper (>= 9), autotools-dev,sonic-common-utils-dev(<<2.0.0),sonic-common-utils-dev(>=1.0.0),sonic-logging-dev(<<2.0.0),sonic-logging-dev(>=1.0.0)
+Standards-Version: 3.9.3
+
+Package: sonic-cps-api
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},sonic-common-utils-lib(<<2.0.0),sonic-common-utils-lib(>=1.0.0),sonic-logging(<<2.0.0),sonic-logging(>=1.0.0)
+Description: This package contains CPS interface
+
+
+Package: sonic-cps-api-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},sonic-common-utils-dev(<<2.0.0),sonic-common-utils-dev(>=1.0.0),sonic-cps-api(<<2.0.0),sonic-cps-api(>=1.0.0),sonic-logging-dev(<<2.0.0),sonic-logging-dev(>=1.0.0)
+Description: This package contains CPS interface
+

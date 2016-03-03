@@ -1,0 +1,5 @@
+etc/init/cps_api_service.conf
+usr/bin/*.py
+usr/bin/*.sh
+usr/lib/*/lib*.so
+cps.so
