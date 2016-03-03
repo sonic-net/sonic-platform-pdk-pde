@@ -29,8 +29,9 @@ include /usr/share/dpkg/default.mk
 
 
 override_dh_gencontrol:
-	dh_gencontrol -psonic-cps-api
-	dh_gencontrol -psonic-cps-api-dev
+	dh_gencontrol -psonic-object-library
+	dh_gencontrol -ppython-sonic-object-library
+	dh_gencontrol -psonic-object-library-dev
        
 override_dh_auto_install:
 	dh_auto_install            

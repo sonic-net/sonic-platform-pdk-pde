@@ -1,10 +1,16 @@
-EXTRA_DIST = cps.so
+#EXTRA_DIST = cps.so
+
+DISTCHECK_CONFIGURE_FLAGS = \
+        --with-systemdsystemunitdir=$$dc_install_base/$(systemdsystemunitdir)
+
+if HAVE_SYSTEMD
+systemdsystemunit_DATA = \
+        scripts/init/cps_api_service.conf
+endif
 
 #Script files
 bin_SCRIPTS = scripts/lib/yang_tools/py/*.py scripts/lib/yang_tools/*.sh \
               scripts/lib/*.py scripts/bin/*
-scriptsdir = /etc/init
-scripts_DATA = scripts/init/cps_api_service.conf
 
 #All exported headers
 nobase_include_HEADERS = sonic/cps_api_errors.h sonic/cps_api_event_init.h \
@@ -23,9 +29,9 @@ libsonic_cps_api_la_SOURCES = src/cps_api_base_event_adapter.cpp \
     src/cps_api_operation_tools.cpp src/cps_api_utils.cpp src/cps_dictionary.cpp \
     src/cps_dictionary_loader.cpp src/cps_ns.cpp
 
-libsonic_cps_api_la_LDFLAGS = -lxml2 -lpthread -lrt
-libsonic_cps_api_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic -I$(includedir)/sonic \
-     			       -I$(includedir)/libxml2
+libsonic_cps_api_la_LDFLAGS = -lxml2 -lpthread -lrt -lsonic_logging -lsonic_common 
+libsonic_cps_api_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
+    -I$(includedir)/sonic 
 
 libsonic_cps_class_map_la_SOURCES = src/cps_class_map_query.cpp
 libsonic_cps_class_map_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
@@ -39,10 +45,31 @@ cps_api_service_SOURCES=src/cps_api_service.cpp
 cps_api_service_CPPFLAGS=-I$(top_srcdir)/sonic -I$(includedir)/sonic
 cps_api_service_LDFLAGS=-lsonic_cps_api -lsonic_common -lsonic_logging
 
-all-local: cps.so
+#cps module
+pyexec_LTLIBRARIES = cps.la
+cps_la_LDFLAGS = -module -avoid-version -export-symbols-regex initpoppler -lsonic_common -lsonic_logging -lpython2.7
+cps_la_SOURCES = src/python_extension/cps_api_python.cpp \
+    src/python_extension/cps_api_python_operation.cpp \
+  src/python_extension/cps_api_python_utils.cpp \
+  src/python_extension/cps_api_python_events.cpp 
+cps_la_CXXFLAGS=-I$(top_srcdir)/src/python_extension -I$(top_srcdir)/sonic -I$(includedir)/sonic -I$(includedir)/python2.7  -std=c++11 
 
-clean-local:
-	rm cps.so
 
-cps.so: src/python_extension/*
-	cd src/python_extension && python setup.py build -v --build-lib ../..
+.PHONY: reload
+reload:
+	-systemctl daemon-reload
+
+.PHONY: disable
+disable:
+	systemctl disable sonic-object-library
+
+.PHONY: enable
+enable:
+	make disable
+	systemctl daemon-reload
+	systemctl enable sonic-object-library
+
+install-data-local:
+	if [ -d /lib/systemd/system ] ; then \
+	    cp $(top_srcdir)/scripts/init/sonic-object-library.service /lib/systemd/system ; \
+    fi
