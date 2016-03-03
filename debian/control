@@ -1,0 +1,24 @@
+Source: sonic-object-library
+Section: net
+Priority: optional
+Maintainer: Dell <support@dell.com>
+Build-Depends: debhelper (>= 9), autotools-dev,sonic-common-utils-dev,sonic-logging-dev,python2.7-dev
+Standards-Version: 3.9.3
+
+Package: sonic-object-library
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},sonic-common-utils-lib,sonic-logging,python2.7-dev
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: python-sonic-object-library
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},sonic-cps-api,sonic-logging,sonic-common-utils,python2.7-dev
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: sonic-object-library-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},sonic-common-utils-dev,sonic-cps-api,sonic-logging-dev
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+

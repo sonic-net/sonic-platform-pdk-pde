@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+
+systemctl daemon-reload || /bin/systemctl enable sonic-object-library  || /bin/systemctl start sonic-object-library 

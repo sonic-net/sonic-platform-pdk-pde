@@ -22,7 +22,10 @@ setup(name="cps", version="0.0",
                              "cps_api_python_utils.cpp",
                              "cps_api_python_events.cpp",
                              "cps_api_python_operation.cpp"],
-                             libraries=[
-			     "cps-class-map-util",
-                             "cps-api-common",],
+                             include_dirs=[
+                             "/usr/include/sonic",
+                             "../../sonic"],
+                             extra_compile_args=[
+                             "-std=c++11",
+                             "-Ipython2.7"],
                              )])
