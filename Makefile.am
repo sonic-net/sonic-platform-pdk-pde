@@ -1,11 +1,8 @@
 #EXTRA_DIST = cps.so
 
-DISTCHECK_CONFIGURE_FLAGS = \
-        --with-systemdsystemunitdir=$$dc_install_base/$(systemdsystemunitdir)
-
 if HAVE_SYSTEMD
-systemdsystemunit_DATA = \
-        scripts/init/cps_api_service.conf
+systemdsystemunit_DATA = scripts/init/sonic-object-library.service
+systemdsystemunitdir = $(prefix)/lib/systemd/system
 endif
 
 #Script files
@@ -69,7 +66,3 @@ enable:
 	systemctl daemon-reload
 	systemctl enable sonic-object-library
 
-install-data-local:
-	if [ -d /lib/systemd/system ] ; then \
-	    cp $(top_srcdir)/scripts/init/sonic-object-library.service /lib/systemd/system ; \
-    fi
