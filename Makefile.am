@@ -33,7 +33,7 @@ libsonic_cps_api_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
 libsonic_cps_class_map_la_SOURCES = src/cps_class_map_query.cpp
 libsonic_cps_class_map_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
                                      -I$(includedir)/sonic
-libsonic_cps_class_map_la_LDFLAGS = -lpthread
+libsonic_cps_class_map_la_LDFLAGS = -lpthread -lsonic_common
 
 #The CLI used to change levels at runtime
 bin_PROGRAMS = cps_api_service
