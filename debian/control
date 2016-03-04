@@ -9,23 +9,31 @@ Standards-Version: 3.9.5
 Package: libsonic-cps0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+Description: SONiC object library - shared library
+ The sonic object library is provides APIs to set/get/delete/create and
+ execute RPC calls using data models provided by components.
 
 Package: python-sonic-object-library
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
  libsonic-cps0 (= ${binary:Version})
-Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+Description: SONiC object library - Python bindings
+ The sonic object library is provides APIs to set/get/delete/create and
+ execute RPC calls using data models provided by components.
 
 Package: libsonic-cps-dev
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libsonic-common-dev,
  libsonic-logging-dev, libsonic-cps0 (= ${binary:Version})
-Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+Description: SONiC object library - development files
+ The sonic object library is provides APIs to set/get/delete/create and
+ execute RPC calls using data models provided by components.
 
 Package: sonic-object-library-service
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends},
  python-sonic-object-library (= ${binary:Version})
-Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+Description: SONiC object library - daemon and utilities
+ The sonic object library is provides APIs to set/get/delete/create and
+ execute RPC calls using data models provided by components.
 
