@@ -6,7 +6,7 @@ Wants=systemd-journal-flush.service
 DefaultDependencies=no
 
 [Service]
-ExecStart=/opt/ngos/bin/cps_api_service.sh
+ExecStart=/usr/bin/cps_api_service.sh
 
 # Resource Limitations
 LimitNOFILE=16384
