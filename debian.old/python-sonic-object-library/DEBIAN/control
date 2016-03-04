@@ -1,0 +1,10 @@
+Package: python-sonic-object-library
+Source: sonic-object-library
+Version: 1.1.0
+Architecture: amd64
+Maintainer: Dell <support@dell.com>
+Installed-Size: 106
+Depends: libc6 (>= 2.4), libgcc1 (>= 1:4.1.1), libpython2.7 (>= 2.7), libstdc++6 (>= 4.1.1), sonic-common-utils-lib, sonic-logging-lib, sonic-cps-api, sonic-logging, sonic-common-utils, python2.7-dev
+Section: net
+Priority: optional
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.

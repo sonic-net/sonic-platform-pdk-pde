@@ -32,7 +32,7 @@ override_dh_gencontrol:
 	dh_gencontrol -psonic-object-library
 	dh_gencontrol -plibsonic-object-library0
 	dh_gencontrol -ppython-sonic-object-library
-	dh_gencontrol -psonic-object-library-dev
+	dh_gencontrol -plibsonic-object-library-dev
        
 override_dh_auto_install:
 	dh_auto_install            
