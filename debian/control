@@ -7,6 +7,12 @@ Standards-Version: 3.9.3
 
 Package: sonic-object-library
 Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-object-library0,sonic-common-utils-lib,sonic-logging,python2.7-dev
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: libsonic-object-library0
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},sonic-common-utils-lib,sonic-logging,python2.7-dev
 Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
 

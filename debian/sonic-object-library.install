@@ -1,3 +1,2 @@
-usr/bin/*.py
-usr/bin/*.sh
-usr/lib/*/lib*.so
+/lib/systemd/*
+usr/bin/*

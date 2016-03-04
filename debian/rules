@@ -30,6 +30,7 @@ include /usr/share/dpkg/default.mk
 
 override_dh_gencontrol:
 	dh_gencontrol -psonic-object-library
+	dh_gencontrol -plibsonic-object-library0
 	dh_gencontrol -ppython-sonic-object-library
 	dh_gencontrol -psonic-object-library-dev
        

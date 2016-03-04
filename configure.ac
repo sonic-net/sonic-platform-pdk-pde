@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.69])
-AC_INIT([sonic-cps-api], [1.0], [clifford_wichmann@dell.com])
+AC_INIT([sonic-object-library], [1.0], [support@dell.com])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
@@ -22,13 +22,6 @@ AM_PATH_PYTHON
 AC_CHECK_LIB([pthread], [pthread_self])
 AC_CHECK_LIB([rt], [main])
 
-#Adding systemd support
-PKG_PROG_PKG_CONFIG
-AC_ARG_WITH([systemdsystemunitdir],
-        AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
-        [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
-AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
-AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir"])
 
 # Python is needed for the C++ bindings.
 AM_PATH_PYTHON([2.7])
@@ -52,4 +45,5 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove memset strstr strtoul])
 
 AC_CONFIG_FILES([Makefile])
+
 AC_OUTPUT
