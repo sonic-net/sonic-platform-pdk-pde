@@ -30,7 +30,7 @@ libsonic_cps_class_map_la_SOURCES = src/cps_class_map_query.cpp
 libsonic_cps_class_map_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
                                      -I$(includedir)/sonic
 libsonic_cps_class_map_la_LDFLAGS = -lpthread -lsonic_common
-libsonic_cps_class_map_la_LIBADD=libsonic_object_library.la
+libsonic_cps_class_map_la_LIBADD=libsonic_object_library.la 
 
 #The CLI used to change levels at runtime
 bin_PROGRAMS = sonic_object_service
@@ -48,7 +48,7 @@ cps_la_SOURCES = src/python_extension/cps_api_python.cpp \
   src/python_extension/cps_api_python_utils.cpp \
   src/python_extension/cps_api_python_events.cpp 
 cps_la_CXXFLAGS=-I$(top_srcdir)/src/python_extension -I$(top_srcdir)/sonic -I$(includedir)/sonic -I$(includedir)/python2.7  -std=c++11 
-cps_la_LIBADD=libsonic_object_library.la
+cps_la_LIBADD=libsonic_object_library.la  libsonic_cps_class_map.la
 
 systemdconfdir=/lib/systemd/system
 systemdconf_DATA = $(top_srcdir)/scripts/init/sonic-object-library.service
