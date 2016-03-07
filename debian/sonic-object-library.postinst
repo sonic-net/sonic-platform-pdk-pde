@@ -1,3 +1,17 @@
 #!/bin/sh
-systemctl enable sonic-object-library
-systemctl start sonic-object-library
+
+set -e
+
+if [ "$1" = configure ]; then
+    if ! getent group cpsusers >/dev/null; then
+        addgroup --quiet --system cpsusers
+    fi
+    if ! getent passwd cpsuser >/dev/null; then
+        adduser --quiet --system \
+                --disabled-login --disabled-password \
+                --home /undefined --no-create-home \
+                --gecos "CPS" cpsuser
+    fi
+fi
+
+#DEBHELPER#

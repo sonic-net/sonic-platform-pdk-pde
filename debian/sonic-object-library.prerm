@@ -1,3 +1,0 @@
-#!/bin/sh
-systemctl stop sonic-object-library
-systemctl disable sonic-object-library
