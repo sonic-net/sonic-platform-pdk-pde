@@ -7,24 +7,24 @@ Standards-Version: 3.9.3
 
 Package: sonic-object-library
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-object-library0,libsonic-common0,libsonic-logging0,python2.7-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7
 Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
 
 
 Package: libsonic-object-library0
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-common0,libsonic-logging0,python2.7-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
 
 
 Package: python-sonic-object-library
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-object-library0,libsonic-logging0,libsonic-common0,python2.7-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7
 Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
 
 
 Package: libsonic-object-library-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-common-dev,libsonic-object-library0,libsonic-logging-dev
+Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-common-dev,libsonic-object-library0 (= ${binary:Version}),libsonic-logging-dev
 Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
 
