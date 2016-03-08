@@ -44,7 +44,10 @@
 #include <string>
 #include <set>
 
-#define CPS_API_NS_ID "/tmp/cps_api_ns"
+
+#define NS_PATH_PREFIX "/run"
+#define NS_CLI_PATH NS_PATH_PREFIX "/cps_obj"
+#define NS_SERV_PATH NS_PATH_PREFIX "/cps_api_ns"
 
 #define DEF_KEY_PRINT_BUFF (100)
 #define MAX_NS_PENDING_REQUESTS (80)
@@ -73,7 +76,7 @@ void cps_api_create_process_address(std_socket_address_t *addr) {
                             //process/thread
 
     snprintf(addr->address.str,sizeof(addr->address.str)-1,
-            "/tmp/cps_inst_%d-%d-%d",(int)std_thread_id_get(),
+            "%s_inst_%d-%d-%d",NS_CLI_PATH,(int)std_thread_id_get(),
             (int)std_process_id_get(),
             ++id);
 }
@@ -81,7 +84,7 @@ void cps_api_create_process_address(std_socket_address_t *addr) {
 void cps_api_ns_get_address(std_socket_address_t *addr) {
     addr->type = e_std_sock_UNIX;
     addr->addr_type = e_std_socket_a_t_STRING;
-    std::string ns = cps_api_user_queue(CPS_API_NS_ID);
+    std::string ns = cps_api_user_queue(NS_SERV_PATH);
     memset(addr->address.str,0,sizeof(addr->address.str));
     strncpy(addr->address.str,ns.c_str(),
             sizeof(addr->address.str)-1);
