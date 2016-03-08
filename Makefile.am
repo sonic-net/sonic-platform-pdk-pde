@@ -21,7 +21,7 @@ libsonic_object_library_la_SOURCES = src/cps_api_base_event_adapter.cpp \
     src/cps_api_operation_tools.cpp src/cps_api_utils.cpp src/cps_dictionary.cpp \
     src/cps_dictionary_loader.cpp src/cps_ns.cpp
 
-libsonic_object_library_la_LDFLAGS = -lxml2 -lpthread -lrt \
+libsonic_object_library_la_LDFLAGS =  -lpthread -lrt \
     -lsonic_logging -lsonic_common -lstdc++
 libsonic_object_library_la_CPPFLAGS = -std=c++11 -I$(top_srcdir)/sonic \
     -I$(includedir)/sonic 
