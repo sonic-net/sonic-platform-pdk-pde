@@ -2,15 +2,26 @@
 
 set -e
 
+#username=cpsusers
+#group=cpsusers
+
+username=root
+group=root
+
+if [ $username = root ] ; then
+    #default no action for root accounts
+    exit 0
+fi
+
 if [ "$1" = configure ]; then
-    if ! getent group cpsusers >/dev/null; then
-        addgroup --quiet --system cpsusers
+    if ! getent group $group >/dev/null; then
+        addgroup --quiet --system $group
     fi
-    if ! getent passwd cpsuser >/dev/null; then
+    if ! getent passwd $username >/dev/null; then
         adduser --quiet --system \
                 --disabled-login --disabled-password \
                 --home /undefined --no-create-home \
-                --gecos "CPS" cpsuser
+                --gecos "CPS" $username
     fi
 fi
 
