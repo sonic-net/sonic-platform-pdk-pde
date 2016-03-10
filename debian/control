@@ -1,0 +1,33 @@
+Source: sonic-object-library
+Section: net
+Priority: optional
+Maintainer: Dell <support@dell.com>
+Build-Depends:
+ debhelper (>= 9), dh-autoreconf, libsonic-common-dev, libsonic-logging-dev,
+ python-dev, dh-python, dh-systemd
+Standards-Version: 3.9.3
+
+Package: sonic-object-library
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: libsonic-object-library0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: python-sonic-object-library
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+XB-Python-Version: ${python:Versions}
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
+
+Package: libsonic-object-library-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},libsonic-common-dev,libsonic-object-library0 (= ${binary:Version}),libsonic-logging-dev
+Description: This package contains SONiC object library.  The sonic object library is provides APIs to set/get/delete/create and execute RPC calls using data models provided by components.
+
