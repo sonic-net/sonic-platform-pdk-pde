@@ -56,6 +56,7 @@ typedef enum {
     cps_api_ret_code_SERVICE_CONNECT_FAIL=3,//!< returned when there is a service but it is not responding
     cps_api_ret_code_INTERNAL_FAILURE=4,    //!< returned if there is an error but it is memory allocation or other internal reasons
     cps_api_ret_code_TIMEOUT=5,             //!< returned when the client specified a timeout and the timeout is expired
+	cps_api_ret_code_IN_PROGRESS=6,			//!< detected that one or more service is not present and will need to use async notif
 } cps_api_return_code_enum_val_t;
 
 /**

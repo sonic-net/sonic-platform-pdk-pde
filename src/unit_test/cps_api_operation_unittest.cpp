@@ -102,9 +102,15 @@ static cps_api_return_code_t db_read_function (void * context, cps_api_get_param
     size_t ix = 0;
     size_t mx = OBJECTS_IN_GET;
 
+    size_t klen = cps_api_key_get_len(the_key);
+
     for ( ; ix < mx ; ++ix ) {
         cps_api_object_t obj = cps_api_object_create();
         cps_api_object_set_key(obj,the_key);
+
+        cps_api_key_set_len(cps_api_object_key(obj),klen+1);
+        cps_api_key_set(cps_api_object_key(obj),klen,ix);
+
         cps_api_object_attr_add(obj,0,"Interface",strlen("Interface"));
         cps_api_object_attr_add(obj,inst,"Interface",strlen("Interface"));
         cps_api_object_attr_add_u64(obj,3,(uint64_t)inst);
@@ -239,6 +245,7 @@ TEST(cps_api_object,test_get) {
             printf("Found attr %s \n",cps_api_object_attr_to_string(it.attr,buff,sizeof(buff)));
         }
     }
+
     cps_api_get_request_close(&get_req);
     ASSERT_TRUE(ix == expected);
 }
@@ -334,6 +341,7 @@ TEST(cps_api_object,test_set) {
     cps_api_object_stats(&keys, og.get());
 }
 
+
 #include "cps_api_operation_tools.h"
 #include "cps_api_object_tools.h"
 
@@ -416,9 +424,12 @@ TEST(cps_api_object,test_tool_op_test) {
 }
 
 
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int rc =  RUN_ALL_TESTS();
+  sleep(200);
+
   cps_api_list_debug();
   return rc;
 }

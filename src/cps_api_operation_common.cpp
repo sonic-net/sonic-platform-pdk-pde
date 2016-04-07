@@ -19,12 +19,15 @@
  **/
 
 
-
 #include "cps_api_operation.h"
+#include "cps_dictionary.h"
+#include "cps_api_object_key.h"
+
 #include "std_mutex_lock.h"
 #include "std_assert.h"
 #include "std_rw_lock.h"
 #include "event_log.h"
+
 #include "cps_api_event_init.h"
 
 #include "private/cps_api_client_utils.h"
@@ -36,7 +39,9 @@
 #include <stdarg.h>
 #include <memory>
 
-#define CPS_API_ATTR_INFO (CPS_API_ATTR_RESERVE_RANGE_END-2)
+#include "cps_db.h"
+
+#define CPS_API_ATTR_INFO (CPS_API_ATTR_RESERVE_RANGE_END-3)
 
 typedef enum {
     cps_api_ATTR_Q_COUNT=1
@@ -44,6 +49,8 @@ typedef enum {
 
 
 typedef std::vector<cps_api_object_category_types_t> processed_objs_t;
+
+static cps_db::connection_cache _db_conn_cache;
 
 extern "C" {
 
@@ -106,6 +113,49 @@ static void cps_api_object_list_swap(cps_api_object_list_t &a, cps_api_object_li
     b = t;
 }
 
+cps_api_return_code_t process_get_request(cps_api_get_params_t *param, size_t ix) {
+	cps_api_object_t obj = cps_api_object_list_get(param->filters,ix);
+	if (obj==nullptr) return cps_api_ret_code_ERR;
+
+	std::vector<char> k;
+
+	if (!cps_db::generate_key(k,obj)) return false;
+
+	cps_db::append_data(k,"*",1);
+
+	cps_db::connection_cache::guard g(_db_conn_cache,_db_conn_cache.get());
+	if (g.get()==nullptr) return cps_api_ret_code_ERR;
+
+	get_objects(*g.get(),k,param->list);
+
+	return cps_api_ret_code_OK;
+}
+
+cps_api_return_code_t process_commit_request(cps_api_transaction_params_t *param, size_t ix) {
+	cps_api_object_t obj = cps_api_object_list_get(param->change_list,ix);
+	cps_api_key_t *key = cps_api_object_key(obj);
+
+	cps_api_qualifier_t qual = cps_db::UPDATE_QUAL(key,cps_api_qualifier_JOURNAL);
+
+	std::vector<char> _key;
+	cps_db::generate_key(_key,key);
+
+	cps_db::connection_cache::guard g(_db_conn_cache,_db_conn_cache.get());
+	if (g.get()==nullptr) return cps_api_ret_code_ERR;
+
+	ssize_t seq = 0;
+	(void)cps_db::get_sequence(*g.get(),_key,seq);
+	cps_api_set_key_data_uint(obj,cps_api_qualifier_JOURNAL,&seq,sizeof(seq));
+
+	if (!store_object(*g.get(),obj)) {
+		return cps_api_ret_code_ERR;
+	}
+	(void)cps_db::UPDATE_QUAL(key,qual);
+
+	return cps_api_ret_code_OK;
+}
+
+
 cps_api_return_code_t cps_api_get(cps_api_get_params_t * param) {
     cps_api_return_code_t rc = cps_api_ret_code_ERR;
 
@@ -145,7 +195,15 @@ cps_api_return_code_t cps_api_get(cps_api_get_params_t * param) {
 
     ix = 0;
     for ( ; ix < mx ; ++ix ) {
-        if ((rc=cps_api_process_get_request(&new_req,ix))!=cps_api_ret_code_OK) break;
+    	cps_api_object_t obj = cps_api_object_list_get(new_req.filters,ix);
+
+    	if (cps_api_obj_has_cached_state(obj)) {
+    		if ((rc=process_get_request(&new_req,ix))!=cps_api_ret_code_OK) {
+    			break;
+    		}
+    	} else {
+    		if ((rc=cps_api_process_get_request(&new_req,ix))!=cps_api_ret_code_OK) break;
+    	}
     }
 
     //based on the return - get the response list
@@ -154,19 +212,45 @@ cps_api_return_code_t cps_api_get(cps_api_get_params_t * param) {
     return rc;
 }
 
+static void remove_pending_request(cps_api_object_t obj) {
+	//clear out the posted request... since the operation failed
+	if (!cps_api_obj_has_cached_state(obj)) {
+		return;
+	}
+	cps_db::connection_cache::guard g(_db_conn_cache,_db_conn_cache.get());
+	if (g.get()==nullptr) return ;
+
+	cps_api_qualifier_t qual = cps_db::UPDATE_QUAL(cps_api_object_key(obj),cps_api_qualifier_JOURNAL);
+	cps_db::delete_object(*g.get(),obj);
+	cps_db::UPDATE_QUAL(cps_api_object_key(obj),qual);
+}
+
 cps_api_return_code_t cps_api_commit(cps_api_transaction_params_t * param) {
     cps_api_return_code_t rc =cps_api_ret_code_OK;
+    bool in_progress_transactions = false;
 
     size_t ix = 0;
     size_t mx = cps_api_object_list_size(param->change_list);
     for ( ; ix < mx ; ++ix ) {
+    	cps_api_object_t obj = cps_api_object_list_get(param->change_list,ix);
+    	cps_api_obj_has_cached_state(obj) && (rc=process_commit_request(param,ix));
+
+    	rc = cps_api_process_commit_request(param,ix);
+    	if (rc==cps_api_ret_code_NO_SERVICE && cps_api_obj_has_cached_state(obj)) {
+    		in_progress_transactions = true;
+    		rc = cps_api_ret_code_OK;
+    	}
+
         if ((rc=cps_api_process_commit_request(param,ix))!=cps_api_ret_code_OK) {
             break;
         }
     }
+
     if (rc!=cps_api_ret_code_OK) {
         while (mx > 0) {
             ix = mx-1;
+        	cps_api_object_t obj = cps_api_object_list_get(param->change_list,ix);
+
             if (cps_api_process_rollback_request(param,ix)!=cps_api_ret_code_OK) {
                 EV_LOG(ERR,DSAPI,0,"ROLLBACK","Failed to rollback request at %d",ix);
             }
@@ -174,6 +258,7 @@ cps_api_return_code_t cps_api_commit(cps_api_transaction_params_t * param) {
         }
     }
 
+    if (in_progress_transactions) return cps_api_ret_code_IN_PROGRESS;
     return rc;
 }
 

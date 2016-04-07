@@ -77,6 +77,8 @@ extern "C" {
  * These are some reserved IDs for the CPS
  * */
 #define CPS_API_OBJ_KEY_ATTRS (CPS_API_ATTR_RESERVE_RANGE_END)
+#define CPS_API_OBJ_TRANS_ID (CPS_API_OBJ_KEY_ATTRS-1)
+#define CPS_API_OBJ_FLAGS (CPS_API_OBJ_TRANS_ID-1)
 
 /** Types of object attributes. */
 typedef enum cps_api_object_ATTR_TYPE_t {
@@ -85,6 +87,10 @@ typedef enum cps_api_object_ATTR_TYPE_t {
     cps_api_object_ATTR_T_U64,//!< cps_api_object_ATTR_T_U64
     cps_api_object_ATTR_T_BIN,//!< cps_api_object_ATTR_T_BIN
 } cps_api_object_ATTR_TYPE_t;
+
+enum cps_api_object_FLAGS_t {
+	cps_api_object_FLAG_RC=0,
+};
 
 /**
  * CPS Object. Each CPS Object has a object key along with a number of attributes.
@@ -441,7 +447,7 @@ bool cps_api_object_received(cps_api_object_t obj, size_t size_of_object_receive
  * @param obj the object that will contain the key + values that are extracted
  * @return true if the  object is successfully extracted otherwise false
  */
-bool cps_api_array_to_object(void * data, size_t len,cps_api_object_t obj) ;
+bool cps_api_array_to_object(const void * data, size_t len,cps_api_object_t obj) ;
 
 /**
  * Create a list of objects.  Each object added to the list is not copied but the list does

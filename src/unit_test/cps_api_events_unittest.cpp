@@ -112,8 +112,8 @@ void * push_client_messages(void *) {
 
     for ( ; ix < mx ; ++ix ) {
         if ((ix %10)==0) {
-            if (cps_api_event_client_disconnect(handle)!=cps_api_ret_code_OK) return false;
-            if (cps_api_event_client_connect(&handle)!=cps_api_ret_code_OK) return false;
+            //if (cps_api_event_client_disconnect(handle)!=cps_api_ret_code_OK) return false;
+            //if (cps_api_event_client_connect(&handle)!=cps_api_ret_code_OK) return false;
         }
         cps_api_key_init(cps_api_object_key(obj),q[ix%2],c[ix%3],1,2,ix%3,ix);
         if (cps_api_event_publish(handle,obj)!=cps_api_ret_code_OK) exit(1);
@@ -169,7 +169,9 @@ bool _cps_api_event_term(cps_api_object_t object,void * context) {
      static int cnt=0;
      printf("%d(%d) - Obj %s\n",__LINE__,cnt,cps_api_object_to_string(object,buff,sizeof(buff)));
      ++cnt;
-     if (cnt==(10000-1)) exit(0);
+     if (cnt==(10000-1)) {
+    	 exit(0);
+     }
      return true;
 }
 
