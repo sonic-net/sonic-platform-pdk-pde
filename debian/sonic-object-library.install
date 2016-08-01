@@ -1,0 +1,5 @@
+lib/systemd/*
+usr/bin/*
+usr/lib/sonic/*.py
+usr/lib/sonic/cpsmetadata/*
+etc/sonic/*

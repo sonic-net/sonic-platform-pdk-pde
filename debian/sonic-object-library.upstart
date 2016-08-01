@@ -1,0 +1,8 @@
+description "SONiC object library IPC"
+
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec /usr/bin/sonic_object_service

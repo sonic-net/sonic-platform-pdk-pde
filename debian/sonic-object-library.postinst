@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+username=cpsusers
+group=cpsusers
+
+if [ $username = root ] ; then
+    #default no action for root accounts
+    exit 0
+fi
+
+if [ "$1" = configure ]; then
+    if ! getent group $group >/dev/null; then
+        addgroup --quiet --system $group
+    fi
+    if ! getent passwd $username >/dev/null; then
+        adduser --quiet --system \
+                --disabled-login --disabled-password \
+                --home /undefined --no-create-home \
+                --gecos "CPS" $username
+    fi
+fi
+
+#DEBHELPER#
