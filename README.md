@@ -35,6 +35,7 @@ For more information see the Object Library developers guide.
 
 Build Instructions
 =====================
+Please see the instructions in the sonic-nas-manifest repo for more details on the common build tools.  [Sonic-nas-manifest](https://github.com/Azure/sonic-nas-manifest)
 
 Development Dependencies 
 - sonic-logging
