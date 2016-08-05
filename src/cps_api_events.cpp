@@ -23,11 +23,11 @@
 #include "std_mutex_lock.h"
 #include "cps_api_events.h"
 #include "cps_class_map.h"
+#include "dell-cps.h"
 
 #include "std_rw_lock.h"
 #include "std_thread_tools.h"
 #include "std_error_codes.h"
-
 
 #include "event_log.h"
 #include "std_time_tools.h"
@@ -38,7 +38,12 @@
 static std_mutex_lock_create_static_init_rec(mutex);
 static cps_api_event_methods_reg_t m_method;
 
-extern "C" {
+
+bool cps_api_event_object_exact_match(cps_api_object_t obj, bool match_flag) {
+    if (match_flag) return cps_api_object_attr_add(obj,CPS_OBJECT_GROUP_EXACT_MATCH,&match_flag,sizeof(match_flag));
+    cps_api_object_attr_delete(obj,CPS_OBJECT_GROUP_EXACT_MATCH);
+    return true;
+}
 
 cps_api_return_code_t cps_api_event_method_register( cps_api_event_methods_reg_t * what )  {
     std_mutex_simple_lock_guard l(&mutex);
@@ -75,10 +80,11 @@ cps_api_return_code_t cps_api_event_publish(cps_api_event_service_handle_t handl
         cps_api_object_t msg) {
     cps_api_return_code_t rc = m_method.publish_function(handle,msg);
     if (rc!=cps_api_ret_code_OK) {
+    	char buff[1024];
         const char *_qua = cps_class_qual_from_key(cps_api_object_key(msg));
         const char *_name = cps_class_string_from_key(cps_api_object_key(msg),1);
         EV_LOG(ERR,DSAPI,0,"CPS-PUB","Failed to publish messages %s:%s",_qua!=nullptr?_qua:"unk",
-                _name!=nullptr ? _name :"unk");
+                _name!=nullptr ? _name :cps_api_key_print(cps_api_object_key(msg),buff,sizeof(buff)-1));
     }
     return rc;
 }
@@ -138,8 +144,15 @@ static  void * _thread_function_(void * param) {
                     auto cb = cb_map[ix].cb;
                     auto param = cb_map[ix].context;
                     std_rw_unlock(&rw_lock);
-                    if (!cb(obj,param)) break;
+                    bool _stop = (!cb(obj,param));
                     std_rw_rlock(&rw_lock);
+                    if (_stop)  {
+                        char _buff[1024];
+                        EV_LOGGING(DSAPI,ERR,"CPS-EVNT-THREAD","Event processing has been stopped due to negative return from CB %s",
+                                cps_api_object_to_string(obj,_buff,sizeof(_buff)));
+                        break;
+                    }
+
                     mx = cb_map.size();
                 }
             }
@@ -235,6 +248,4 @@ cps_api_return_code_t cps_api_event_thread_shutdown(void) {
     std_rw_lock_write_guard wg(&rw_lock);
     cb_map.clear();
     return cps_api_ret_code_OK;
-}
-
 }

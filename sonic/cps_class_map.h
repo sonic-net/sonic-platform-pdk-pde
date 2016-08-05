@@ -264,6 +264,15 @@ void cps_api_class_map_init(void);
  */
 bool cps_class_map_attr_type(cps_api_attr_id_t id, CPS_CLASS_DATA_TYPE_t *t);
 
+
+/**
+ * Query the class metada and get the attribute type
+ * @param id the attribute type to look for
+ * @param t is the attribute class type (leaf, leaf-list, embedded, etc..) to be filled in
+ * @return true if the attribute was found otherwise false and the t pointer will be untouched
+ */
+bool cps_class_map_attr_class(cps_api_attr_id_t id, CPS_CLASS_ATTR_TYPES_t *t);
+
 /****
  * The following API indicate an object's ownership (or also considered as storage location) of an object.
  *     This can be a:

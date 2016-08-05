@@ -1,8 +1,8 @@
 
 [Unit]
 Description=The CPS service is responsible for supporting communcation between applications
-After=systemd-journal-flush.service
-Wants=systemd-journal-flush.service
+After=redis-server.service
+Wants=redis-server.service
 DefaultDependencies=no
 
 [Service]
