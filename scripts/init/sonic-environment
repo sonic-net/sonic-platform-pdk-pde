@@ -1,2 +1,2 @@
 LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
-PYTHONPATH=/usr/lib/sonic
+PYTHONPATH=/usr/lib/sonic:/usr/lib/x86_64-linux-gnu/sonic

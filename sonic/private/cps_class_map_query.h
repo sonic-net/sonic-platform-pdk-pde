@@ -43,12 +43,10 @@
 #include <string>
 
 /** @cond HIDDEN_SYMBOLS */
-
-#define CPS_DEF_SEARCH_PATH "/usr/lib/sonic/cpsmetadata"  //the location of the generated class
-/** @endcond */
-
-#define CPS_DEF_SEARCH_PATH_CFG "/etc"
-#define CPS_DEF_META_SEARCH_PATHS  CPS_DEF_SEARCH_PATH ":/etc/sonic:" CPS_DEF_SEARCH_PATH_CFG
+#define CPS_DEF_CLASS_MAP_STARTING "/usr/lib"
+#define CPS_DEF_SEARCH_PATH "/usr/lib/sonic"        //the location of the generated class
+#define CPS_DEF_SEARCH_PATH_CFG "/etc/sonic"
+#define CPS_DEF_META_SEARCH_PATHS  CPS_DEF_SEARCH_PATH ":" CPS_DEF_SEARCH_PATH_CFG ":"
 
 #define CPS_DEF_CLASS_FILE_NAME "cpsclass"      //must match with the generated lib name
 #define CPS_DEF_CLASS_XML_SUFFIX "-cpsmetadata.xml"

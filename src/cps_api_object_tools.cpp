@@ -91,9 +91,27 @@ bool cps_api_obj_tool_merge(cps_api_object_t main, cps_api_object_t overlay) {
 
     cps_api_object_it_begin(overlay,&it);
     do {
-        cps_api_object_attr_delete(main,cps_api_object_attr_id(it.attr));
+        CPS_CLASS_ATTR_TYPES_t _type;
+        if (!cps_class_map_attr_class(cps_api_object_attr_id(it.attr),&_type)) {
+            _type = CPS_CLASS_ATTR_T_LEAF;
+        }
+        do {
+            cps_api_attr_id_t _id = cps_api_object_attr_id(it.attr);
+            cps_api_object_attr_delete(main,_id);
+            if (_type==CPS_CLASS_ATTR_T_LEAF_LIST) {
+                if (cps_api_object_attr_get(main,_id)!=nullptr) {
+                    continue;
+                }
+            }
+        } while (0);
+    } while (cps_api_object_it_next(&it));
+
+    cps_api_object_it_begin(overlay,&it);
+    do {
+        size_t _attr_len = cps_api_object_attr_len(it.attr);
+        if (_attr_len==0) continue;
         if (!cps_api_object_attr_add(main,cps_api_object_attr_id(it.attr),cps_api_object_attr_data_bin(it.attr),
-                cps_api_object_attr_len(it.attr))) {
+                _attr_len)) {
             return false;
         }
     } while (cps_api_object_it_next(&it));

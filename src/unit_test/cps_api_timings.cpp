@@ -32,6 +32,8 @@
 #include "cps_api_operation_tools.h"
 #include "cps_api_object_tools.h"
 
+#include "cps_class_ut_data.h"
+
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
@@ -48,6 +50,11 @@ cps_api_attr_id_t ids[][6] = {
         {ID_START+1,ID_START+3 ,ID_START+4,ID_START,ID_START+5 },
         {ID_START*10+1,ID_START*10+3 ,ID_START*10+4,ID_START*10,ID_START*10+5 },
 };
+
+
+TEST(cps_api_timer,seed_meta_data) {
+    __init_class_map();
+}
 
 TEST(cps_api_timer,test_init) {
     /**
@@ -129,6 +136,14 @@ TEST(cps_api_timer,test_reg) {
     cps_api_key_from_attr_with_qual(&funcs.key,ID_START,cps_api_qualifier_TARGET);
 
     ASSERT_TRUE(cps_api_register(&funcs)==cps_api_ret_code_OK);
+}
+
+TEST(cps_api_timer,test_benchmark_set_16000) {
+    for ( size_t ix = 0, mx = 16000; ix < mx ; ++ix ){
+        cps_api_object_t obj = cps_api_obj_tool_create(cps_api_qualifier_TARGET,BASE_IP_IPV4_ADDRESS_IP,false);
+        cps_api_object_attr_add(obj,1,"Cliff",6);
+        //throw out the object for this test
+    }
 }
 
 TEST(cps_api_timer,test_benchmark_getobj_10000x1_test) {
