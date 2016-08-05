@@ -26,9 +26,10 @@
 #include "dell-cps.h"
 
 #include "cps_class_map.h"
-
+#include "cps_api_key_cache.h"
 #include "cps_string_utils.h"
 #include "cps_api_vector_utils.h"
+#include "cps_api_object_tools.h"
 
 #include "std_mutex_lock.h"
 #include "event_log.h"
@@ -42,7 +43,11 @@
 #include <mutex>
 #include <unordered_map>
 #include <memory>
+#include <set>
 
+namespace {
+static  const size_t CHECK_GROUP_INTERVAL =1000*3;
+}
 struct db_connection_details {
     static const uint64_t timeout = 60*1000*1000 ; //60 seconds
 
@@ -78,16 +83,65 @@ struct __db_event_handle_t {
     std::unordered_map<std::string,std::unique_ptr<cps_db::connection>> _connections;
     std::unordered_map<std::string,db_connection_details> _connection_mon;
 
+    cps_api_key_cache<std::vector<cps_api_object_t>> _filters;
+
     fd_set _connection_set;
     ssize_t _max_fd;
 
     cps_api_object_list_t _pending_events=nullptr;
 
+    bool object_matches_filter(cps_api_object_t obj) ;
+    bool object_add_filter(cps_api_object_t obj) ;
+    bool object_filter_exists(cps_api_object_t obj);
+
     void update_connection_set() ;
     void add_connection_state_event(const char *node, const char *group, bool state) ;
 
     void disconnect_node(const std::string &node, bool update_fd_set=true) ;
+
+    ~__db_event_handle_t() ;
 };
+
+__db_event_handle_t::~__db_event_handle_t() {
+    auto fn = [](cps_api_key_cache<std::vector<cps_api_object_t>>::cache_data_iterator &it) -> bool {
+        for ( auto list : it->second ) {
+            for (auto clean_it : list.data ) {
+                cps_api_object_delete(clean_it);
+            }
+        }
+        return true;
+    };
+    _filters.walk(fn);
+}
+
+bool __db_event_handle_t::object_matches_filter(cps_api_object_t obj) {
+    std::vector<cps_api_object_t> *filt = _filters.at(cps_api_object_key(obj),true);
+    if (filt==nullptr) return true;
+    for (auto it : *filt ) {
+        if (cps_api_obj_tool_matches_filter(it,obj,true)) return true;
+    }
+    return false;
+}
+
+bool __db_event_handle_t::object_add_filter(cps_api_object_t obj) {
+    cps_api_object_guard og(cps_api_object_create());
+    if (og.get()==nullptr) return false;
+    if (!cps_api_object_clone(og.get(),obj)) return false;
+
+    cps_api_object_attr_delete(og.get(),CPS_OBJECT_GROUP_EXACT_MATCH);
+
+    cps_api_key_t *key = cps_api_object_key(og.get());
+    std::vector<cps_api_object_t> *filt = _filters.at(key,true);
+    if (filt==nullptr) {
+        std::vector<cps_api_object_t> lst;
+        lst.push_back(og.get());
+        _filters.insert(key,std::move(lst));
+    } else {
+        filt->push_back(og.get());
+    }
+    og.release();
+    return true;
+}
 
 void __db_event_handle_t::disconnect_node(const std::string &node, bool update_fd_set) {
     _connections.erase(node);
@@ -127,10 +181,12 @@ static void __resync_regs(cps_api_event_service_handle_t handle) {
 
     for (auto it : nd->_group_keys) {
         cps_api_node_set_iterate(it.first,[nd,&it,&handle,&_connections_changed](const std::string &node,void *context) {
+            //occurs one for each node in the group
             auto con_it = nd->_connections.find(node);
-            if (con_it==nd->_connections.end()) {
+            if (con_it==nd->_connections.end()) {    //if the connection is good
                 return;
             }
+
             if (nd->_connection_mon[node]._group_reg[it.first]==true) return ;
 
             //for each client key associated with the group
@@ -158,9 +214,16 @@ static bool __check_connections(cps_api_event_service_handle_t handle) {
 
     bool changed = false;
 
+    std::set<std::string> nodes;
+
+    for ( auto &it : nd->_connections ) {
+        nodes.insert(it.first);
+    }
+
     for (auto it : nd->_group_keys) {
-        cps_api_node_set_iterate(it.first,[&nd,&changed,it,&handle](const std::string &node,void *context) {
+        cps_api_node_set_iterate(it.first,[&nd,&changed,it,&handle,&nodes](const std::string &node,void *context) {
                 auto con_it = nd->_connections.find(node);
+
                 if (con_it==nd->_connections.end()) {
                     std::unique_ptr<cps_db::connection> c(new cps_db::connection);
                     if (!c->connect(node)) {
@@ -184,12 +247,20 @@ static bool __check_connections(cps_api_event_service_handle_t handle) {
                 if (nd->_connection_mon[node]._group_reg.find(it.first)==nd->_connection_mon[node]._group_reg.end()) {
                     nd->_connection_mon[node]._group_reg[it.first] = false;
                 }
+                nodes.erase(node);
             },handle);
-
     }
+
+    changed = changed || (nodes.size()>0);
+
+    for ( auto & it : nodes ) {
+        nd->_connections.erase(it);
+    }
+
     if (changed) {
         nd->update_connection_set();
     }
+
     return changed;
 }
 
@@ -223,11 +294,22 @@ static cps_api_return_code_t _register_one_object(cps_api_event_service_handle_t
         EV_LOG(ERR,DSAPI,0,"CPS-EVNT-REG","Invalid object being registered for %s",cps_api_object_to_string(object,buff,sizeof(buff)-1));
         return cps_api_ret_code_ERR;
     }
-    nh->_group_keys[_group].push_back(std::move(_key));
 
+    try {
+        nh->_group_keys[_group].push_back(std::move(_key));    //add this key to the group
+    } catch(std::exception &e) {
+        return cps_api_ret_code_ERR;
+    }
+
+    //for each node in the group say need to be audited
     cps_api_node_set_iterate(_group,[&nh,_group](const std::string &node,void *context) {
         nh->_connection_mon[node]._group_reg[_group] = false;
     },nullptr);
+
+    bool *_is_filt_obj = (bool*)cps_api_object_get_data(object,CPS_OBJECT_GROUP_EXACT_MATCH);
+    if (_is_filt_obj!=nullptr && *_is_filt_obj) {
+        nh->object_add_filter(object);
+    }
 
     return cps_api_ret_code_OK;
 }
@@ -342,7 +424,7 @@ static cps_api_return_code_t _cps_api_wait_for_event(
             cps_api_object_clone(msg,og.get());
             return cps_api_ret_code_OK;
         }
-        if (std_time_is_expired(last_checked,MILLI_TO_MICRO(1000*15))) {    //wait for 5 seconds before scanning again
+        if (std_time_is_expired(last_checked,MILLI_TO_MICRO(CHECK_GROUP_INTERVAL))) {    //wait for 5 seconds before scanning again
             last_checked = std_get_uptime(nullptr);
             __maintain_connections(nh);
         }
@@ -384,6 +466,7 @@ static cps_api_return_code_t _cps_api_wait_for_event(
 
             if (has_data) {
                 if (get_event(it.second.get(),msg)) {
+                    if (!nh->object_matches_filter(msg)) continue;        //throw out if doesn't match
                     nh->_connection_mon[it.first].communicated();
                     cps_api_object_attr_add(msg,CPS_OBJECT_GROUP_NODE,it.first.c_str(),it.first.size()+1);
                     return cps_api_ret_code_OK;

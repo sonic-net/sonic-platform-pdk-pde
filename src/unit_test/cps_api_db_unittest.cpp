@@ -44,10 +44,7 @@
 TEST(cps_api_db,init) {
     std::vector<cps_api_attr_id_t> ids ;
 
-    size_t ix = 0;
-    for ( ; ix < lst_len ; ++ix ) {
-        cps_class_map_init(lst[ix].id,&(lst[ix]._ids[0]),lst[ix]._ids.size(),&lst[ix].details);
-    }
+    __init_class_map();
     cps_api_object_guard og(cps_api_object_create());
     cps_api_key_from_attr_with_qual(cps_api_object_key(og.get()),BASE_IP_IPV6,cps_api_qualifier_TARGET);
     cps_api_obj_set_ownership_type(cps_api_object_key(og.get()),CPS_API_OBJECT_DB);
@@ -179,6 +176,34 @@ TEST(cps_api_db,db_set_list_obj) {
     ASSERT_EQ(cps_api_object_list_size(newl),cps_api_object_list_size(list));
 }
 
+TEST(cps_api_db,test_object_lifecycle) {
+    cps_api_object_list_guard lg(cps_api_object_list_create());
+    cps_api_object_guard og(cps_api_obj_tool_create(cps_api_qualifier_TARGET,BASE_IP_IPV6,false));
+    cps_api_object_attr_add_u32(og.get(),BASE_IP_IPV6_VRF_ID,1);
+    cps_api_object_attr_add_u32(og.get(),BASE_IP_IPV6_IFINDEX,2);
+    std::string _name = "----";
+    cps_api_object_attr_add(og.get(),BASE_IP_IPV6_NAME,_name.c_str(),_name.size()+1);
+    ASSERT_TRUE(cps_api_commit_one(cps_api_oper_CREATE, og.get(), 0, 200)==cps_api_ret_code_OK);
+
+    //replace attributes
+    _name = "Shankara/Jana/Joe/Joe";
+    cps_api_object_attr_add(og.get(),BASE_IP_IPV6_NAME,_name.c_str(),_name.size()+1);
+    ASSERT_TRUE(cps_api_commit_one(cps_api_oper_SET, og.get(), 0, 200)==cps_api_ret_code_OK);
+
+    cps_api_object_attr_delete(og.get(),BASE_IP_IPV6_NAME);
+    cps_api_object_attr_add_u32(og.get(),BASE_IP_IPV6_ENABLED,1);
+    ASSERT_TRUE(cps_api_commit_one(cps_api_oper_SET, og.get(), 0, 200)==cps_api_ret_code_OK);
+
+    ASSERT_TRUE(cps_api_get_objs(og.get(),lg.get(), 0, 200)==cps_api_ret_code_OK);
+
+    ASSERT_TRUE(cps_api_object_list_size(lg.get())==1);
+
+    cps_api_object_attr_add(og.get(),BASE_IP_IPV6_NAME,_name.c_str(),_name.size()+1);
+
+    ASSERT_TRUE(cps_api_obj_tool_matches_filter(og.get(),cps_api_object_list_get(lg.get(),0),true));
+    ASSERT_TRUE(cps_api_commit_one(cps_api_oper_DELETE, og.get(), 0, 200)==cps_api_ret_code_OK);
+}
+
 TEST(cps_api_db,db_node_list) {
 
     cps_api_object_t obj = cps_api_object_create();
@@ -286,6 +311,7 @@ TEST(cps_api_db,db_node_get_with_compare) {
         }
     }
 }
+
 
 TEST(cps_api_db,db_general_test) {
     cps_api_object_list_guard lg(cps_api_object_list_create());

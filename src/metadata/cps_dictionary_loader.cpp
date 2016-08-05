@@ -45,20 +45,39 @@ static std_mutex_lock_create_static_init_rec(lock);
 static std::map<std::string,struct stat> _loaded_libs;
 
 static bool _cps_class_data(const char *name, std_dir_file_TYPE_t type,void *context) {
-    if (type != std_dir_file_T_FILE) return true;
+	if (name==nullptr) return true;
+	if (type != std_dir_file_T_FILE) return true;
 
+    std::string _dup_check = name;
+
+    if ((context!=nullptr) && _dup_check.find((const char*)context)==std::string::npos) {
+   	 return true;
+    }
 
      struct stat _stats;
      if (stat(name,&_stats)!=0) {
          memset(&_stats,0,sizeof(_stats));
      }
 
+     auto _loc = _dup_check.rfind('/');
+     if (_loc!=std::string::npos) {
+    	 _dup_check = _dup_check.substr(_loc+1);
+     }
+
+	_loc = _dup_check.find('.');
+
+     if (_loc!=std::string::npos) {
+    	 _dup_check = _dup_check.substr(0,_loc);
+     }
+
      std_mutex_simple_lock_guard lg(&lock);
 
     //avoid duplicate loaded libs..
-    if (_loaded_libs.find(name)!=_loaded_libs.end()) {
-        if (_loaded_libs[name].st_ino == _stats.st_ino) return true;
+    if (_loaded_libs.find(_dup_check)!=_loaded_libs.end()) {
+        return true;
     }
+
+    EV_LOGGING(DSAPI,ERR,"CPS-META","loading class library %s as %s",name,_dup_check.c_str());
     if (strstr(name,(const char*)context)!=NULL) {
         void (*class_data_init)(void)=nullptr;
          static std_shlib_func_map_t func_map[] = {
@@ -70,27 +89,26 @@ static bool _cps_class_data(const char *name, std_dir_file_TYPE_t type,void *con
          if (STD_ERR_OK != std_shlib_load(name, &lib_hndl, func_map, func_map_size)) {
              EV_LOG(ERR,DSAPI,0,"cps_class_data","Can not load function map");
          } else {
-             _loaded_libs[name] = _stats;
+             _loaded_libs[_dup_check] = _stats;
 
              class_data_init();
              //Since we don't need to use any functions in the library after initialized
              //then we can unload the library
              std_shlib_unload(lib_hndl);
          }
-
     }
     return true;
 }
 
 bool cps_class_objs_load(const char *path, const char * prefix) {
-    t_std_error rc = std_dir_iterate(path,_cps_class_data,(void*)prefix,false);
+    t_std_error rc = std_dir_iterate(path,_cps_class_data,(void*)prefix,true);
     return rc==STD_ERR_OK;
 }
 
 void cps_api_class_map_init(void) {
     const char * path = std_getenv("LD_LIBRARY_PATH");
     if (path==NULL) {
-        path = CPS_DEF_SEARCH_PATH;
+        path = CPS_DEF_CLASS_MAP_STARTING;
     }
     std_parsed_string_t handle = NULL;
     if (!std_parse_string(&handle,path,":")) {

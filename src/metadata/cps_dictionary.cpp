@@ -321,6 +321,13 @@ int    cps_api_enum_value(cps_api_attr_id_t id, const char *tag) {
     return eit->second.value(tag);
 }
 
+bool cps_class_map_attr_class(cps_api_attr_id_t id, CPS_CLASS_ATTR_TYPES_t *t) {
+    const cps_class_map_node_details_int_t * it = cps_dict_find_by_id(id);
+    if (it==nullptr) return false;
+    *t = it->attr_type;
+    return true;
+}
+
 bool cps_class_map_attr_type(cps_api_attr_id_t id, CPS_CLASS_DATA_TYPE_t *t) {
     const cps_class_map_node_details_int_t * it = cps_dict_find_by_id(id);
     if (it==nullptr) return false;
