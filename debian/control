@@ -6,6 +6,8 @@ Build-Depends:
  debhelper (>= 9), dh-autoreconf, libsonic-common-dev, libsonic-logging-dev,
  python-dev, dh-python, dh-systemd, libhiredis-dev
 Standards-Version: 3.9.3
+Vcs-Browser: https://github.com/Azure/sonic-object-library
+Vcs-Git: https://github.com/Azure/sonic-object-library.git
 
 Package: sonic-object-library
 Architecture: any
