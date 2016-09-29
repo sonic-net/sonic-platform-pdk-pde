@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.69])
-AC_INIT([sonic-object-library], [1.0.1], [support@dell.com])
+AC_INIT([sonic-object-library], [1.0.1], [sonicproject@gmail.com])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
