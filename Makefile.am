@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS=-I m4
+
 #Script files
 
 bin_SCRIPTS = scripts/bin/*

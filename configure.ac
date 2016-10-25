@@ -5,6 +5,7 @@ AC_INIT([sonic-object-library], [1.0.1], [sonicproject@gmail.com])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 LT_INIT([shared])
 
 # Checks for programs.
