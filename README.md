@@ -19,7 +19,7 @@ A high level list of CPS features are:
 Lookup and binary to text translation and object introspection available
 
 
-Applications define objects through (optionally yang based) object models.  These object models are converted into binary (C accessable) object keys and object attributes that can be used in conjunction with the C-based CPS APIs.  There are adaptions on top of CPS that allows these objects and APIs to be converted to different languages like Python.
+Applications define objects through (optionally yang based) object models.  These object models are converted into binary (C accessible) object keys and object attributes that can be used in conjunction with the C-based CPS APIs.  There are adaptions on top of CPS that allows these objects and APIs to be converted to different languages like Python.
 
 With the object keys and attributes applications can:
 * Get a single or get a multiple objects
@@ -42,7 +42,7 @@ Development Dependencies
 - sonic-common-utils
 - libhiredis >= 0.10
 
-Depenedent packages:
+Dependent packages:
   libsonic-logging1 libsonic-logging-dev libsonic-common1 libsonic-common-dev 
 
 BUILD CMD:  sonic_build libsonic-logging1 libsonic-logging-dev libsonic-common1 libsonic-common-dev -- clean binary
