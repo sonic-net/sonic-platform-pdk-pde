@@ -241,14 +241,16 @@ static bool process_query(int fd, size_t len) {
     const char *str = cps_class_string_from_key(&key, 1);
     const char *qual = cps_class_qual_from_key(&key);
     if (str!=nullptr)
-        EV_LOG(TRACE,DSAPI,0,"NS","NS query for %s %s found %s",
+        EV_LOG(TRACE,DSAPI,0,"NS","NS query for %s %s %s %s %s",
                 qual,
                 str,
                 cps_api_key_print(&key,ink,sizeof(ink)-1),
+                found ? "found" : "",
                 found ? cps_api_key_print(&cpy.key,matchk,sizeof(matchk)-1) : "missing");
     else
-        EV_LOG(TRACE,DSAPI,0,"NS","NS query for %s found %s",
+        EV_LOG(TRACE,DSAPI,0,"NS","NS query for %s %s %s",
                 cps_api_key_print(&key,ink,sizeof(ink)-1),
+                found ? "found" : "",
                 found ? cps_api_key_print(&cpy.key,matchk,sizeof(matchk)-1) : "missing");
 
     if (!found) {
