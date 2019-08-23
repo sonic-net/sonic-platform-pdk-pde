@@ -1,0 +1,134 @@
+{
+  "PLATFORM": {
+    "powercontrol": true,
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "PSU1": {
+        "psu_serial_num": "AAAA"
+      },
+      "PSU2": {
+        "psu_serial_num": "BBBB"
+      }
+    },
+    "SFP": {
+      "present": [
+        6,
+        9,
+        15,
+        24,
+        36,
+        39,
+        48,
+        56,
+        64,
+        68,
+        72
+      ]
+    },
+    "USB": {
+      "enable": "yes",
+      "device": "sdb",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "00:11:22:33:44:55",
+      "ser": "AABBCCDDEEFF",
+      "model": "AAAA"
+    },
+    "CPLD": {
+      "CPLD1": {
+        "version": "2"
+      },
+      "CPLD2": {
+        "version": "1"
+      }
+    },
+    "FAN": {
+      "present": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "FAN1": {
+        "direction": 0
+      },
+      "FAN2": {
+        "direction": 0
+      },
+      "FAN3": {
+        "direction": 0
+      },
+      "FAN4": {
+        "direction": 0
+      }
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "XX:XX:XX:XX:XX:XX"
+       }
+    },
+    "SYSLED":
+    {
+       "FANTRAY":{
+           "FANTRAY1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY3":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY4":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            }
+       },
+       "PSU":{
+           "PSU1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           },
+           "PSU2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           }
+       },
+       "FAN":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    }
+
+  }
+}

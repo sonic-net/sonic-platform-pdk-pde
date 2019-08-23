@@ -1,0 +1,152 @@
+{
+  "PLATFORM": {
+    "powercontrol": "TRUE/FALSE",
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "PSU#X": {
+        "psu_serial_num": "XXXX"
+      },
+      "PSU#X+1": {
+        "psu_serial_num": "XXXX"
+      }
+    },
+    "SFP": {
+      "present": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "SFP#X": {
+        "lpmode": "ON/OFF"
+      }
+    },
+    "EEPROM": {
+      "mac": "XX:XX:XX:XX:XX:XX",
+      "ser": "XXXXXXXXXX",
+      "model": "XXXXXXXX"
+    },
+    "CPLD": {
+      "CPLD#X": {
+        "version": "XX"
+      },
+      "CPLD#X+1": {
+        "version": "XX"
+      },
+      "CPLD#X+2": {
+        "version": "XX"
+      }
+    },
+    "FAN": {
+      "present": [
+        1,
+        2
+      ],
+      "FAN#X": {
+        "direction": "0/1"
+      },
+      "FAN#X+1": {
+        "direction": "0/1"
+      }
+    },
+    "USB": {
+      "enable": "yes/no",
+      "device": "sd#X",
+      "mountpoint": "/xxxx/xxxxxxx"
+    },
+    "MAC": {
+      "MAC#X": {
+        "ifname": "XXX",
+        "macaddr": "XX:XX:XX:XX:XX:XX"
+      }
+    },
+    "SYSLED":
+    {
+       "FANTRAY":{
+           "FANTRAY1":{
+              "color":"GREEN/RED/AMBER",
+              "state" : "SOLID/BLINKING"
+            },
+           "FANTRAY2":{
+              "color":"GREEN/RED/AMBER",
+              "state" : "SOLID/BLINKING"
+            }
+       },
+       "PSU":{
+           "PSU1":{
+              "color":"GREEN/RED/AMBER",
+              "state" : "SOLID/BLINKING"
+           },
+           "PSU2":{
+              "color":"GREEN/RED/AMBER",
+              "state" : "SOLID/BLINKING"
+           }
+       },
+       "FAN":{
+         "color":"GREEN/RED/AMBER",
+         "state" : "SOLID/BLINKING"
+       },
+       "SYS":{
+         "color":"GREEN/RED/AMBER",
+         "state" : "SOLID/BLINKING"
+       },
+       "LOC":{
+         "color":"GREEN/RED/AMBER",
+         "state" : "SOLID/BLINKING"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    },
+    "CONFIG":
+    {
+      "required": {
+        "config.bcm": [
+          "parity_enable=1"
+        ]
+      }
+    }
+    "TRAFFIC":
+    {
+      "port_pairs":[
+        {
+          "src_front_portnum":"1",
+          "src_logical_portnum":"xe0",
+          "dst_front_portnum":"2",
+          "dst_logical_portnum":"xe1"
+        },
+        {
+          "src_front_portnum":"2",
+          "src_logical_portnum":"xe1",
+          "dst_front_portnum":"1",
+          "dst_logical_portnum":"xe0"
+        },
+        {
+          "src_front_portnum":"49",
+          "src_logical_portnum":"ce3",
+          "dst_front_portnum":"50",
+          "dst_logical_portnum":"ce4"
+        },
+        {
+          "src_front_portnum":"50",
+          "src_logical_portnum":"ce4",
+          "dst_front_portnum":"49",
+          "dst_logical_portnum":"ce3"
+        }
+      ]
+    }
+  }
+}

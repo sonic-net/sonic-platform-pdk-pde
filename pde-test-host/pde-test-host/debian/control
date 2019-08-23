@@ -1,0 +1,13 @@
+Source: pde-test-host
+Section: devel
+Priority: optional
+Maintainer: Bill Schwartz <william.schwartz@broadcom.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 4.1.3
+
+Package: pde-test-host
+Architecture: any
+Section:utils
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SONiC PDE test utility for SAI
+	This utility intended to be used as part of the PDE.

@@ -1,0 +1,97 @@
+{
+  "PLATFORM": {
+    "num_psus": 0,
+    "num_cplds": 0,
+    "num_syseeproms": 0,
+    "num_fans": 0,
+    "num_ports": 0,
+    "num_temps": 0,
+    "num_serviceports": 0,
+    "serviceport": "eth0",
+    "modules" : {
+      "FAN": {
+        "support" : "true/false",
+        "path": "XXXX",
+        "name": "XXXX",
+        "class": "XXXX"
+      },
+      "CPLD" : {
+        "support" : "true/false",
+        "path" :"XXXX",
+        "name" :"XXXX",
+        "class" : "XXXX"
+      },
+      "SYSLED" : {
+        "support" : "true/false",
+        "path" :"XXXX",
+        "name" :"XXXX",
+        "class" : "XXXX"
+      },
+      "TEMP" : {
+        "support" : "true/false",
+        "path" :"XXXX",
+        "name" :"XXXX",
+        "class" : "XXXX"
+      }
+    },
+    "drivers": {
+      "CPLD": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "PSU": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "FAN": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "TEMP": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "SYSLED": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "EEPROM": {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      },
+      "MAC" : {
+        "driver_info": {
+          "support": "true/false",
+          "type": "ODM/GENERIC/PDDF",
+          "name": "xxxx"
+        }
+      }
+    }
+  }
+}
+

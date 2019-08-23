@@ -1,0 +1,2 @@
+pde-test-host /usr/bin/
+parse_port_config.py /usr/bin

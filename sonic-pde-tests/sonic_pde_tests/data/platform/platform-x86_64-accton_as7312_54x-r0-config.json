@@ -1,0 +1,90 @@
+{
+  "PLATFORM": {
+    "num_psus": 2,
+    "num_cplds": 3,
+    "num_syseeproms": 1,
+    "num_fans": 4,
+    "num_ports": 54,
+    "num_sfps": 6,
+    "num_temps": 3,
+    "num_serviceports": 1,
+    "serviceport": "eth0",
+    "modules" : {
+      "FAN": {
+        "support" : "true",
+        "path": "as7312_54x",
+        "name": "fanutil",
+        "class": "FanUtil"
+      },
+      "TEMP": {
+        "support" : "true",
+        "path": "as7312_54x",
+        "name": "thermalutil",
+        "class": "ThermalUtil"
+      },
+      "CPLD": {
+        "support": "false"
+      },
+      "SYSLED": {
+        "support": "false"
+      }
+    },
+    "drivers": {
+      "CPLD": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_i2c_cpld"
+        }
+      },
+      "PSU": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_as7312_54x_psu"
+        }
+      },
+      "FAN": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_as7312_54x_fan"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "TEMP": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "lm75"
+        }
+      },
+      "SYSLED": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_as7312_54x_leds"
+        }
+      },
+      "EEPROM": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "at24"
+        }
+      },
+      "MAC": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "igb"
+        }
+      }
+    }
+  }
+}
+
