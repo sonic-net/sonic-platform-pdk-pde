@@ -1,0 +1,82 @@
+{
+  "PLATFORM": {
+    "num_psus": 2,
+    "num_cplds": 0,
+    "num_syseeproms": 1,
+    "num_fans": 0,
+    "num_ports": 56,
+    "num_sfps": 56,
+    "num_temps": 0,
+    "num_serviceports": 1,
+    "serviceport": "eth0",
+    "thermal_policy_support": "false",
+    "modules" : {
+      "FAN": {
+        "support": "false"
+      },
+      "TEMP": {
+        "support": "false"
+      },
+      "CPLD": {
+        "support": "false"
+      },
+      "SYSLED": {
+        "support": "false"
+      },
+      "PSU": {
+        "support": "false"
+      }
+    },
+    "drivers": {
+      "CPLD": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "qci_platform_ix8"
+        }
+      },
+      "PSU": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "FAN": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "TEMP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "SYSLED": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "qci_cpld_led"
+        }
+      },
+      "EEPROM": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "at24"
+        }
+      },
+      "MAC": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "igb"
+        }
+      }
+    }
+  }
+}
+

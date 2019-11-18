@@ -1,0 +1,146 @@
+{
+  "PLATFORM": {
+    "powercontrol": false,
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "status": [
+        "True",
+        "False"
+      ],
+      "PSU1": {
+        "psu_serial_num": "AAAA"
+      },
+      "PSU2": {
+        "psu_serial_num": "BBBB"
+      }
+    },
+    "SFP": {
+      "present": [
+        13,
+        17,
+        52,
+        68
+      ]
+    },
+    "USB": {
+      "enable": "yes",
+      "device": "sdb",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "3c:2c:99:2e:d9:75",
+      "ser": "771232X1752003",
+      "model": "7712-32X-O-AC-F"
+    },
+    "CPLD": {
+      "CPLD1": {
+        "version": "2"
+      },
+      "CPLD2": {
+        "version": "1"
+      }
+    },
+    "FAN": {
+      "present": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "FAN1": {
+        "direction": 0
+      },
+      "FAN2": {
+        "direction": 0
+      },
+      "FAN3": {
+        "direction": 0
+      },
+      "FAN4": {
+        "direction": 0
+      },
+      "FAN5": {
+        "direction": 0
+      },
+      "FAN6": {
+        "direction": 0
+      }
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "3c:2c:99:2e:d9:75"
+       }
+    },
+    "SYSLED":
+    {
+       "FANTRAY":{
+           "FANTRAY1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY3":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY4":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            }
+       },
+       "PSU":{
+           "PSU1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           },
+           "PSU2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           }
+       },
+       "FAN":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    },
+    "CONFIG":
+    {
+      "required": {
+        "config.bcm": [
+          "parity_enable=1"
+        ]
+      }
+    }
+  }
+}

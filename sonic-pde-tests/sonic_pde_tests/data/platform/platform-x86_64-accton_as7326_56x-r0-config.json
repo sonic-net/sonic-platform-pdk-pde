@@ -1,0 +1,87 @@
+{
+  "PLATFORM": {
+    "num_psus": 2,
+    "num_cplds": 3,
+    "num_syseeproms": 1,
+    "num_fans": 6,
+    "num_ports": 54,
+    "num_sfps": 6,
+    "num_temps": 6,
+    "num_serviceports": 1,
+    "serviceport": "eth0",
+    "thermal_policy_support": "true",
+    "modules" : {
+     "FAN": {
+        "support": "true"
+      },
+      "TEMP": {
+        "support": "true"
+      },
+      "CPLD": {
+        "support": "false"
+      },
+      "SYSLED": {
+        "support": "false"
+      },
+      "PSU": {
+        "support": "true"
+      }
+    },
+    "drivers": {
+      "CPLD": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_i2c_cpld"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "PSU": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "FAN": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "TEMP": {
+        "driver_info": {
+          "support": "false"
+        }
+      },
+      "SYSLED": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_as7326_56x_leds"
+        }
+      },
+      "EEPROM": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "at24"
+        }
+      },
+      "MAC": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "tg3"
+        }
+      }
+    }
+  }
+}
+

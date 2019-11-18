@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+PACKAGE_NAME := sonic-platform-pde
+TOPDIR := $(shell pwd)
+PYTHON ?= python2
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	make -C sonic-pde-tests/sonic_pde_saiut
+
+override_dh_auto_install:
+	mkdir -p debian/$(PACKAGE_NAME)/usr/local
+	cp -rf $(TOPDIR)/sonic-pde-tests/sonic_pde_tests debian/$(PACKAGE_NAME)/usr/local
+	cp -rf $(TOPDIR)/sonic-pde-tests/sonic_pde_saiut/*.so debian/$(PACKAGE_NAME)/usr/local/sonic_pde_tests/
+	cp -rf $(TOPDIR)/sonic-pde-tests/sonic_pde_saiut/*.py debian/$(PACKAGE_NAME)/usr/local/sonic_pde_tests/
+	cd sonic-pde-tests; \
+		$(PYTHON) setup.py install --root=$(TOPDIR)/debian/$(PACKAGE_NAME) --install-layout=deb
+
+override_dh_usrlocal:
+
+override_dh_clean:
+	dh_clean
+	make -C sonic-pde-tests/sonic_pde_saiut clean

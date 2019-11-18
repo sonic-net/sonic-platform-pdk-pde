@@ -1,0 +1,123 @@
+{
+  "PLATFORM": {
+    "powercontrol": false,
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "status": [
+        true,
+        false
+      ],
+      "PSU1": {
+        "mfr_id":"ChiconyPower",
+        "model":"R17-1K6P1AA",
+        "output_voltage":12000,
+        "psu_serial_num": "F387881844001008"
+      }
+    },
+    "SFP": {
+      "present": [
+        0,
+        2,
+        31
+      ]
+    },
+    "USB": {
+      "enable": "yes",
+      "device": "sda",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "d8:c4:97:cd:e7:d6",
+      "ser": "123456789",
+      "model": "T9032-IX9",
+      "platform": "x86_64-quanta_bwde-r0"
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "d8:c4:97:cd:e7:d6"
+       }
+    },
+    "FAN": {
+      "present": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "FAN2": {
+        "direction": "EXHAUST"
+      },
+      "FAN3": {
+        "direction": "EXHAUST"
+      },
+      "FAN4": {
+        "direction": "EXHAUST"
+      },
+      "FAN5": {
+        "direction": "EXHAUST"
+      },
+      "FAN6": {
+        "direction": "EXHAUST"
+      }
+    },
+    "SYSLED":
+    {
+       "FAN":{
+         "color":"Green",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"Green",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"Green",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    },
+    "CONFIG":
+    {
+      "required": {
+        "config.bcm": [
+          "parity_enable=1"
+        ]
+      }
+    },
+    "TRAFFIC":
+    {
+      "port_pairs":[
+        {
+          "src_front_portnum":"1",
+          "src_logical_portnum":"cd0",
+          "dst_front_portnum":"32",
+          "dst_logical_portnum":"cd31"
+        },
+        {
+          "src_front_portnum":"32",
+          "src_logical_portnum":"cd31",
+          "dst_front_portnum":"1",
+          "dst_logical_portnum":"cd0"
+        }
+      ]
+    }
+  }
+}

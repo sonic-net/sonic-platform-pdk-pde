@@ -1,0 +1,195 @@
+{
+  "PLATFORM": {
+    "powercontrol": false,
+    "THERMAL_POLICY": {
+        "service_name": "false"
+    },
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "status": [
+        false,
+        true
+      ],
+      "PSU1": {
+        "psu_serial_num": "AAAA"
+      },
+      "PSU2": {
+        "psu_serial_num": "SA070V581905000496",
+	"model":"YM-2651Y",
+	"output_voltage":12093
+      }
+    },
+    "SFP": {
+      "present": [
+        8,
+        16,
+        32,
+	36,
+        40, 
+	52,
+	56
+      ]
+    },
+    "USB": {
+      "enable": "no",
+      "device": "sdb",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "80:a2:35:46:3f:99",
+      "ser": "772632X1911067",
+      "model": "7726-32X-O-AC-F"
+    },
+    "CPLD": {
+      "CPLD1": {
+        "version": "2"
+      },
+      "CPLD2": {
+        "version": "1"
+      }
+    },
+    "FAN": {
+      "present": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "FAN1": {
+        "direction": "INTAKE" 
+      },
+      "FAN2": {
+        "direction": "INTAKE" 
+      },
+      "FAN3": {
+        "direction": "INTAKE" 
+      },
+      "FAN4": {
+        "direction": "INTAKE" 
+      },
+      "FAN5": {
+        "direction": "INTAKE" 
+      },
+      "FAN6": {
+        "direction": "INTAKE" 
+      }
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "80:a2:35:46:3f:99"
+       }
+    },
+    "SYSLED":
+    {
+       "FANTRAY":{
+           "FANTRAY1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY3":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY4":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY5":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY6":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            }
+       },
+       "PSU":{
+           "PSU1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           },
+           "PSU2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           }
+       },
+       "FAN":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "DIAG":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    },
+    "CONFIG":
+    {
+      "required": {
+        "config.bcm": [
+          "parity_enable=0"
+        ]
+      }
+    },
+    "TRAFFIC":
+    {
+      "port_pairs":[
+        {
+          "src_front_portnum":"3",
+          "src_logical_portnum":"xe0",
+          "dst_front_portnum":"4",
+          "dst_logical_portnum":"xe1"
+        },
+        {
+          "src_front_portnum":"4",
+          "src_logical_portnum":"xe1",
+          "dst_front_portnum":"3",
+          "dst_logical_portnum":"xe0"
+        },
+        {
+          "src_front_portnum":"12",
+          "src_logical_portnum":"ce11",
+          "dst_front_portnum":"13",
+          "dst_logical_portnum":"ce12"
+        },
+        {
+          "src_front_portnum":"13",
+          "src_logical_portnum":"ce12",
+          "dst_front_portnum":"12",
+          "dst_logical_portnum":"ce11"
+        }
+      ]
+    }
+  }
+}

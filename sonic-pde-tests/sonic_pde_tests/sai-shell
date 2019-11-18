@@ -1,0 +1,17 @@
+#!/usr/bin/python
+
+import os.path
+import sys
+import saiut
+
+SONIC_PLATFORM_PATH='/usr/share/sonic/platform'
+
+rv = saiut.switchInitialize("00:11:22:33:44:55")
+if rv != saiut.SAI_STATUS_SUCCESS:
+    print("Error: Unable to initialize the switch, rv={}".format(rv))
+    sys.exit(1)
+
+if os.path.exists(SONIC_PLATFORM_PATH + '/led_proc_init.soc'):
+    saiut.bcmDiagCommand('rcload ' + SONIC_PLATFORM_PATH + '/led_proc_init.soc')
+
+saiut.switchShell(True)

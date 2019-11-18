@@ -1,0 +1,5 @@
+sonic-platform-pde (1.0) unstable; urgency=low
+
+  * Add support for SAI unit test cores for SWIG-Python interface
+
+ -- Dante Su <dante.su@broadcom.com>  Tue, 29 Oct 2019 15:00:00 +0800
