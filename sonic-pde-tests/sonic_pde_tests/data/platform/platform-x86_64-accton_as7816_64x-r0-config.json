@@ -1,0 +1,98 @@
+{
+  "PLATFORM": {
+    "num_psus": 2,
+    "num_cplds": 2,
+    "num_syseeproms": 1,
+    "num_fans": 4,
+    "num_ports": 54,
+    "num_sfps": 64,
+    "num_temps": 6,
+    "num_serviceports": 1,
+    "serviceport": "eth0",
+    "modules" : {
+      "FAN": {
+        "support": "true",
+        "path": "as7816_64x",
+        "name": "fanutil.py",
+        "class": "FanUtil"
+      },
+      "TEMP": {
+        "support": "true",
+        "path": "as7816_64x",
+        "name": "thermalutil",
+        "class": "ThermalUtil"
+      },
+      "CPLD": {
+        "support": "true",
+        "path": "as7816_64x",
+        "name": "cpldutil",
+        "class" : "CpldUtil"
+      },
+      "SYSLED": {
+        "support": "true",
+        "path": "as7816_64x",
+        "name": "ledutil",
+        "class": "LedUtil"
+      }
+    },
+    "drivers": {
+      "CPLD": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "accton_i2c_cpld"
+        }
+      },
+      "PSU": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "as7816_64x_psu"
+        }
+      },
+      "FAN": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "as7816_64x_fan"
+        }
+      },
+      "SFP": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "as7816_64x_sfp"
+        }
+      },
+      "TEMP": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "lm75"
+        }
+      },
+      "SYSLED": {
+        "driver_info": {
+          "support": "true",
+          "type": "ODM",
+          "name": "as7816_64x_leds"
+        }
+      },
+      "EEPROM": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "at24"
+        }
+      },
+      "MAC": {
+        "driver_info": {
+          "support": "true",
+          "type": "GENERIC",
+          "name": "igb"
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,162 @@
+{
+  "PLATFORM": {
+    "powercontrol": true,
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "PSU1": {
+        "psu_serial_num": "AAAA"
+      },
+      "PSU2": {
+        "psu_serial_num": "BBBB"
+      }
+    },
+    "SFP": {
+      "present": [
+        6,
+        9,
+        15,
+        24,
+        36,
+        39,
+        48,
+        56,
+        64,
+        68,
+        72
+      ]
+    },
+    "USB": {
+      "enable": "yes",
+      "device": "sdb",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "00:11:22:33:44:55",
+      "ser": "AABBCCDDEEFF",
+      "model": "AAAA"
+    },
+    "CPLD": {
+      "CPLD1": {
+        "version": "2"
+      },
+      "CPLD2": {
+        "version": "1"
+      }
+    },
+    "FAN": {
+      "present": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "FAN1": {
+        "direction": "exhaust"
+      },
+      "FAN2": {
+        "direction": "exhaust"
+      },
+      "FAN3": {
+        "direction": "exhaust"
+      },
+      "FAN4": {
+        "direction": "exhaust"
+      },
+      "FAN5": {
+        "direction": "exhaust"
+      },
+      "FAN6": {
+        "direction": "exhaust"
+      }
+    },
+    "THERMAL_POLICY":
+    {
+       "service_name": "as7312-platform-monitor",
+       "POLICY_NUM":4,
+       "F2B":
+       {
+         "0": [0,34000,32],
+         "1": [35000,39000,50],
+         "2": [40000,44000,63],
+         "3": [45000,100000,100]
+       },
+       "B2F":
+       {
+         "0": [0,34000,44],
+         "1": [35000,39000,63],
+         "2": [40000,44000,75],
+         "3": [45000,100000,100]
+       },
+       "FAN_REMOVED_DUTY":100
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "XX:XX:XX:XX:XX:XX"
+       }
+    },
+    "SYSLED":
+    {
+       "FANTRAY":{
+           "FANTRAY1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY3":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            },
+           "FANTRAY4":{
+              "color":"GREEN",
+              "state" : "SOLID"
+            }
+       },
+       "PSU":{
+           "PSU1":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           },
+           "PSU2":{
+              "color":"GREEN",
+              "state" : "SOLID"
+           }
+       },
+       "FAN":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"GREEN",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    }
+
+  }
+}

@@ -1,0 +1,10 @@
+Source: sonic-platform-pde
+Section: main
+Priority: extra
+Maintainer: Dante Su <dante.su@broadcom.com>, Geans Pin <geans.pin@broadcom.com>, William Schwartz <william.schwartz@broadcom.com>
+Build-Depends: debhelper (>= 9), bzip2
+Standards-Version: 3.9.3
+
+Package: sonic-platform-pde
+Architecture: amd64
+Description: PDE test suite

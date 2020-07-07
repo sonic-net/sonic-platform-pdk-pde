@@ -1,0 +1,112 @@
+{
+  "PLATFORM": {
+    "powercontrol": false,
+    "PSU": {
+      "present": [
+        1,
+        2
+      ],
+      "status": [
+        true,
+        true
+      ]
+    },
+    "SFP": {
+      "present": [
+        0,
+        1,
+        48,
+        49
+      ]
+    },
+    "USB": {
+      "enable": "yes",
+      "device": "sdb",
+      "mountpoint": "/media/usb-storage"
+    },
+    "EEPROM": {
+      "mac": "d8:c4:97:28:30:a8",
+      "ser": "QTFCU38030006",
+      "model": "T4048-IX8"
+    },
+    "MAC":
+    {
+       "MAC1":{
+         "ifname": "eth0",
+         "macaddr": "54:ab:3a:9c:17:e5"
+       }
+    },
+    "SYSLED":
+    {
+       "FAN":{
+         "color":"Green",
+         "state" : "SOLID"
+       },
+       "SYS":{
+         "color":"Green",
+         "state" : "SOLID"
+       },
+       "LOC":{
+         "color":"Green",
+         "state" : "SOLID"
+       }
+    },
+    "OS":
+    {
+      "flooding": {
+        "dmesg": [
+          "error"
+        ],
+        "syslog": [
+          "i2c",
+          "usb",
+          "pci"
+        ]
+      }
+    },
+    "CONFIG":
+    {
+      "required": {
+        "config.bcm": [
+          "parity_enable=1"
+        ]
+      }
+    },
+    "PMON":
+    {
+      "syslog": [
+        "psud",
+        "fand"
+      ]
+    },
+    "TRAFFIC":
+    {
+      "port_pairs":[
+        {
+          "src_front_portnum":"1",
+          "src_logical_portnum":"xe0",
+          "dst_front_portnum":"2",
+          "dst_logical_portnum":"xe1"
+        },
+        {
+          "src_front_portnum":"2",
+          "src_logical_portnum":"xe1",
+          "dst_front_portnum":"1",
+          "dst_logical_portnum":"xe0"
+        },
+        {
+          "src_front_portnum":"49",
+          "src_logical_portnum":"ce3",
+          "dst_front_portnum":"50",
+          "dst_logical_portnum":"ce4"
+        },
+        {
+          "src_front_portnum":"50",
+          "src_logical_portnum":"ce4",
+          "dst_front_portnum":"49",
+          "dst_logical_portnum":"ce3"
+        }
+      ]
+    }
+  }
+}
