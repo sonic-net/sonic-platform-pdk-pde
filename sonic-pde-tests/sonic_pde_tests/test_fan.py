@@ -37,6 +37,12 @@ def _wrapper_init():
              module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
              platform_fanutil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
              platform_fanutil = platform_fanutil_class()
+
+             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
+             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
+             platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
+             platform_psuutil = platform_psuutil_class()
+
        except Exception as e:
              print("Failed to load fanutil due to {}".format(repr(e)))
 
@@ -60,6 +66,16 @@ def _wrapper_get_fan_direction(index):
         except NotImplementedError:
             pass
     return platform_fanutil.get_direction(index+1)
+
+def _wrapper_get_psu_direction(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+        try:
+            return platform_chassis.get_psu(index)._fan_list[0].get_direction()
+        except NotImplementedError:
+            pass
+    return platform_psuutil.get_direction(index+1)
+
 
 def _wrapper_get_fan_status(index):
     _wrapper_init()
@@ -146,8 +162,11 @@ def test_for_fans_dir(json_config_data, json_test_data):
 
     for key in json_config_data:
         for x in json_test_data[key]['FAN']['present']:
-            assert _wrapper_get_fan_direction(x-1) == json_test_data[key]['FAN']['FAN'+str(x)]['direction'],\
+            assert _wrapper_get_fan_direction(x-1).lower() == json_test_data[key]['FAN']['FAN'+str(x)]['direction'],\
                    "FAN{}: DIR mismatched".format(x)
+            for j in json_test_data[key]['PSU']['present']:
+                assert _wrapper_get_psu_direction(j-1).lower() == _wrapper_get_fan_direction(x-1).lower(),\
+                   "FAN{}: PSU{} DIR mismatched".format(x,j)
 
 def test_for_fans_status(json_config_data, json_test_data):
 
@@ -232,6 +251,9 @@ def test_for_fans_duty(json_config_data, json_test_data):
     """
     if json_config_data['PLATFORM']['modules']['FAN']['support'] == "false":
        pytest.skip("Skip the testing due to the python module is not supported in BSP")
+	   
+    if json_config_data['PLATFORM']['modules']['FAN']['fan_duty_control_support'] == "false":
+       pytest.skip("Skip the testing due to the BMC platform fan control is not supported in BSP")
 
     # Only verify FAN Duty set ;; FAN Read will be verified in Thermal Test
     # start FAN speed/duty test

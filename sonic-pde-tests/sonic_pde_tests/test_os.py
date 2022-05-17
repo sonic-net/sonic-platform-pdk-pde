@@ -110,7 +110,7 @@ def test_for_flooding_dmesg(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp1.append(int(cnt))
 
     # sampling period
@@ -124,7 +124,7 @@ def test_for_flooding_dmesg(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp2.append(int(cnt))
 
     for idx in range(len(pat)):
@@ -169,7 +169,7 @@ def test_for_flooding_syslog(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp1.append(int(cnt))
 
     # sampling period
@@ -183,10 +183,71 @@ def test_for_flooding_syslog(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp2.append(int(cnt))
 
     for idx in range(len(pat)):
         assert cp2[idx] == cp1[idx], "flooding syslog [" + pat[idx] + "] detected"
 
     return
+
+def test_for_fstrim():
+    """Test Purpose:  Verify that if TRIM properlly enabled for SSDs
+
+    Args:
+        None
+
+    Note:
+        Periodic TRIM is always enabled on the SONiC platforms, and it launches
+        '/sbin/fstrim -av' weekly
+        """
+    ssd = False
+    opts = subprocess.check_output("lsblk -l -o NAME,TYPE | grep disk | head -1", shell=True).decode('ascii')
+    disk = opts.split()[0]
+
+    chk1 = subprocess.check_output("cat /sys/class/block/{0}/queue/discard_granularity".format(disk), shell=True).decode('ascii')
+    chk1 = chk1.strip()
+    chk2 = subprocess.check_output("cat /sys/class/block/{0}/queue/discard_max_bytes".format(disk), shell=True).decode('ascii')
+    chk2 = chk2.strip()
+    if (int(chk1, 10) == 0) or (int(chk2, 10) == 0):
+        pytest.skip("'{0}' does not support TRIM".format(disk))
+
+    if disk.startswith("nvme"):
+        ssd = True
+    else:
+        rota = subprocess.check_output("cat /sys/class/block/{0}/queue/rotational".format(disk), shell=True).decode('ascii')
+        rota = rota.strip()
+        ssd = (int(rota, 10) > 0)
+
+    if not ssd:
+        pytest.skip("'{0}' is not a SSD".format(disk))
+
+    mtab = subprocess.check_output("cat /etc/mtab | grep '/dev/{0}' | head -1".format(disk), shell=True).decode('ascii')
+    opts = mtab.split()[3]
+    assert "discard" in opts, "{0}: discard/TRIM is not enabled".format(disk)
+    return
+
+def test_for_cpuload():
+    """Test Purpose:  Verify that if CPU load is not higher than expected
+
+    Args:
+        None
+
+    Note:
+        This test should only be launched when swss/syncd is disabled or without running traffic
+        """
+    lower_bound = 90.0
+    data = subprocess.check_output("iostat -c 1 3", shell=True).decode('ascii')
+    info = False
+    load = 0.0
+    for row in data.split('\n'):
+        if row.startswith('avg-cpu'):
+            info = True
+            continue
+        if info:
+           load += float(row.split()[5])
+        info = False
+
+    load /= 3
+    load = 100 - load
+    assert load < lower_bound, "CPU load is too high"

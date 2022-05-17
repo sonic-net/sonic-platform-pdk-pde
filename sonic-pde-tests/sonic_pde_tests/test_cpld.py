@@ -27,7 +27,7 @@ def load_platform_cpldutil(json_config_data):
         platform_cpldutil_class = getattr(platform_cpldutil_module,class_name)
         platform_cpldutil = platform_cpldutil_class()
 
-    except AttributeError, e:
+    except AttributeError as e:
         print("Failed to instantiate '%s' class: %s" % (class_name, str(e)), True)
 
     return

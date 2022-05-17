@@ -17,33 +17,45 @@ PLATFORM_SPECIFIC_CLASS_NAME = "SfpUtil"
 
 # Global platform-specific sfputil class instance
 platform_sfputil = None
+platform_chassis = None
 
 # Global port dictionaries
 port_dict = None
+first_phy_port =1
 
-# Loads platform specific sfputil module from source
-def load_platform_sfputil():
+# Loads platform specific module from source
+def _wrapper_init():
+    global platform_chassis
     global platform_sfputil
 
-    if platform_sfputil is not None:
-        return
+    # Load new platform api class
+    if platform_chassis is None:
+       try:
+           import sonic_platform.platform
+           platform_chassis = sonic_platform.platform.Platform().get_chassis()
+       except Exception as e:
+           print("Failed to load chassis due to {}".format(repr(e)))
 
-    try:
-        module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-        module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-    except IOError, e:
-        print("Failed to load platform module '%s': %s" % (PLATFORM_SPECIFIC_MODULE_NAME, str(e)), True)
+    #Load SfpUtilHelper class
+    if platform_sfputil is None:
+       try:
+           import sonic_platform_base.sonic_sfp.sfputilhelper
+           platform_sfputil = sonic_platform_base.sonic_sfp.sfputilhelper.SfpUtilHelper()
+       except Exception as e:
+           print("Failed to load chassis due to {}".format(repr(e)))
 
-    assert module is not None
+    # Load platform-specific fanutil class
+    if platform_chassis is None:
+       try:
+             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
+             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
+             platform_sfputil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
+             platform_sfputil = platform_sfputil_class()
+       except Exception as e:
+             print("Failed to load sfputil due to {}".format(repr(e)))
 
-    try:
-        platform_sfputil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
-        platform_sfputil = platform_sfputil_class()
-    except AttributeError, e:
-        print("Failed to instantiate '%s' class: %s" % (PLATFORM_SPECIFIC_CLASS_NAME, str(e)), True)
+       assert (platform_chassis is not None) or (platform_sfputil is not None), "Unable to load platform module"
 
-    assert platform_sfputil is not None
-    return
 
 # Get platform specific HwSKU path
 def get_hwsku_path():
@@ -78,6 +90,107 @@ def load_platform_portdict():
 
     return port_dict
 
+# Find out the physical port is 0-based or 1-based
+def find_port_index_based():
+    global first_phy_port
+    
+    # Load port info
+    try:
+         port_config_file_path = get_hwsku_path() + "/port_config.ini"
+         platform_sfputil.read_porttab_mappings(port_config_file_path)
+    except Exception as e:
+         print("Failed to read port info: %s".format(repr(e)))
+
+    if platform_sfputil.logical_to_physical[platform_sfputil.logical[0]][0] == 0:
+       first_phy_port = 0
+    elif platform_sfputil.logical_to_physical[platform_sfputil.logical[0]][0] == 1:
+       first_phy_port = 1
+    else:
+       # default is 1-based
+       first_phy_port = 1
+
+
+def _wrapper_is_qsfp_port(physical_port):
+    _wrapper_init()
+    find_port_index_based()
+    if platform_chassis is not None:
+       if "QSFP" in platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A"):
+          return True
+    else:
+       if physical_port in platform_sfputil.qsfp_ports:
+          return True
+    return False
+
+
+def _wrapper_get_transceiver_info_type(physical_port):
+    find_port_index_based()
+    if platform_chassis is not None:
+       try:
+           return platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A")
+       except NotImplementedError:
+           pass
+    return platform_sfputil.get_transceiver_info_dict(physical_port).get("type","N/A")
+
+
+def _wrapper_get_num_sfps():
+    _wrapper_init()
+    load_platform_portdict()
+    if platform_chassis is not None:
+       try:
+           return platform_chassis.get_num_sfps()
+       except NotImplementedError:
+           pass
+
+    num = 0
+    for intf in natsorted(port_dict.keys()):
+        port = int(port_dict[intf]['index'])
+        if not platform_sfputil._is_valid_port(port):
+           continue
+        num += 1
+
+    return num
+
+def _wrapper_get_presence(physical_port):
+    _wrapper_init()
+    find_port_index_based()
+    if platform_chassis is not None:
+       try:
+          return platform_chassis.get_sfp(physical_port).get_presence()
+       except NotImplementedError:
+          pass
+    return platform_sfputil.get_presence(physical_port)
+
+def _wrapper_get_low_power_mode(physical_port):
+    _wrapper_init()
+    find_port_index_based()
+    if platform_chassis is not None:
+       try:
+          return platform_chassis.get_sfp(physical_port).get_lpmode()
+       except NotImplementedError:
+              pass
+    return platform_sfputil.get_low_power_mode(physical_port)
+
+def _wrapper_set_low_power_mode(physical_port, enable):
+    _wrapper_init()
+    find_port_index_based()
+    if platform_chassis is not None:
+       try:
+           return platform_chassis.get_sfp(physical_port).set_lpmode(enable)
+       except NotImplementedError:
+           pass
+    return platform_sfputil.set_low_power_mode(physical_port, enable)
+
+def _wrapper_reset(physical_port):
+    _wrapper_init()
+    find_port_index_based()
+    if platform_chassis is not None:
+       try:
+           return platform_chassis.get_sfp(physical_port).reset()
+       except NotImplementedError:
+           pass
+    return platform_sfputil.reset(physical_port)
+
+
 # Test for SFP port number
 def test_for_sfp_number(json_config_data):
     """Test Purpose:  Verify that the numer of SFPs reported as supported by the SFP plugin matches what the platform supports.
@@ -95,17 +208,8 @@ def test_for_sfp_number(json_config_data):
             }
         }
         """
-    load_platform_sfputil()
-    load_platform_portdict()
-    num = 0
-    for intf in natsorted(port_dict.keys()):
-        port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-            continue
-        num += 1
-
     for plat in json_config_data:
-        assert num == int(json_config_data[plat]["num_sfps"])
+        assert _wrapper_get_num_sfps() == int(json_config_data[plat]["num_sfps"])
 
     return
 
@@ -139,13 +243,10 @@ def test_for_sfp_present(json_config_data, json_test_data):
             }
         }
         """
-    load_platform_sfputil()
     load_platform_portdict()
     for intf in natsorted(port_dict.keys()):
         port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-            continue
-        bool = platform_sfputil.get_presence(port)
+        bool = _wrapper_get_presence(port)
         for plat in json_config_data:
             list = json_test_data[plat]['SFP']['present']
             if port in list:
@@ -184,35 +285,15 @@ def test_for_sfp_eeprom(json_config_data, json_test_data):
             }
         }
         """
-    load_platform_sfputil()
     load_platform_portdict()
     for intf in natsorted(port_dict.keys()):
         port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-            continue
-        bool = platform_sfputil.get_presence(port)
+        bool = _wrapper_get_presence(port)
         for plat in json_config_data:
             list = json_test_data[plat]['SFP']['present']
             if port in list:
                 assert bool == True, "SFP{} is not present unexpectedly".format(port)
-                code = 0
-                data = platform_sfputil.get_eeprom_raw(port)
-                assert data != None, "SFP{}: unable to read EEPROM".format(port)
-                if port in platform_sfputil.osfp_ports:
-                    #OSFP/QSFP-DD
-                    for i in range(128, 222):
-                        code += int(data[i], 16)
-                    assert (code & 0xff) == int(data[222], 16), "check code error"
-                elif port in platform_sfputil.qsfp_ports:
-                    #QSFP
-                    for i in range(128, 191):
-                        code += int(data[i], 16)
-                    assert (code & 0xff) == int(data[191], 16), "check code error"
-                else:
-                    #SFP/SFP+
-                    for i in range(0, 63):
-                        code += int(data[i], 16)
-                    assert (code & 0xff) == int(data[63], 16), "check code error"
+                assert _wrapper_get_transceiver_info_type(port) is not None,"SFP{} EEPROM is fail to get".format(port)
             else:
                 assert bool == False, "SFP{} is present".format(port)
     return
@@ -224,25 +305,23 @@ def test_for_sfp_lpmode():
     Args:
         None
         """
-    load_platform_sfputil()
     load_platform_portdict()
     for intf in natsorted(port_dict.keys()):
         port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-            continue
-        if port not in platform_sfputil.qsfp_ports:
-            continue
-        try:
-            bool = platform_sfputil.get_low_power_mode(port)
-        except NotImplementedError:
-            assert False, (intf + ': get_low_power_mode() is not implemented')
-        if bool:
-            try:
-                platform_sfputil.set_low_power_mode(port, False)
-            except NotImplementedError:
-                assert False, (intf + ': low power detected while ' +
-                               'set_low_power_mode() is not implemented,' +
-                               'link errors are expected on high power modules')
+        if _wrapper_get_presence(port):
+          if not _wrapper_is_qsfp_port(port):
+             continue
+          try:
+              bool = _wrapper_get_low_power_mode(port)
+          except NotImplementedError:
+              assert False, (intf + ': get_low_power_mode() is not implemented')
+          if bool:
+              try:
+                  _wrapper_set_low_power_mode(port, False)
+              except NotImplementedError:
+                  assert False, (intf + ': low power detected while ' +
+                                 'set_low_power_mode() is not implemented,' +
+                                 'link errors are expected on high power modules')
     return
 
 # Test for SFP LPMODE
@@ -252,18 +331,16 @@ def test_for_sfp_reset():
     Args:
         None
         """
-    load_platform_sfputil()
     load_platform_portdict()
     for intf in natsorted(port_dict.keys()):
         port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-            continue
-        if port not in platform_sfputil.qsfp_ports:
-            continue
-        try:
-            bool = platform_sfputil.reset(port)
-            assert bool, "reset failed"
-        except NotImplementedError:
+        if _wrapper_get_presence(port):
+          if not _wrapper_is_qsfp_port(port):
+             continue
+          try:
+               bool = _wrapper_reset(port)
+               assert bool, "reset failed"
+          except NotImplementedError:
             # By defalt, it does no harm to have this unimplemented
             # This failure will only be observed when users try to manually
             # reset the module via CLI

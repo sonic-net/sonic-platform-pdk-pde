@@ -69,6 +69,33 @@ def _wrapper_get_temperature(index):
             pass
     return -255
 
+
+def _wrapper_get_high_threshold(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+        try:
+            return platform_chassis.get_thermal(index).get_high_threshold()
+        except NotImplementedError:
+            pass
+    return -255
+
+def _wrapper_get_high_critical_threshold(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+        try:
+            return platform_chassis.get_thermal(index).get_high_critical_threshold()
+        except NotImplementedError:
+            pass
+    return -255
+
+def _wrapper_get_fan_name(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+        try:
+            return platform_chassis.get_fan(index).get_name()
+        except NotImplementedError:
+            pass
+    return "FAN {}".format(index+1)
 def _wrapper_get_fan_presence(index):
     _wrapper_init()
     if platform_chassis is not None:
@@ -157,6 +184,57 @@ def test_for_temp_read(json_config_data):
         assert _wrapper_get_temperature(x) != -255, "tmp{}: invalid temperature".format(x)
 
 
+def test_for_temp_high_threshold_read(json_config_data):
+    """Test Purpose:  Verify that high threshold of each Temp sensors defined in the platform config
+                      josn is able to read
+
+
+               Args:
+                    arg1 (json): platform-<sonic_platform>-config.json
+
+            Example:
+                    For a system that physically supports 4 TEMPs
+
+                    platform-<sonic_platform>-config.json
+                    {
+                         "PLATFORM": {
+                             num_temps": 4
+                         }
+                    }
+    """
+    if json_config_data['PLATFORM']['modules']['TEMP']['support'] == "false":
+       pytest.skip("Skip the testing due to the python module is not supported")
+
+    for x in range(json_config_data['PLATFORM']['num_temps']):
+        print("tmp{}: {}".format(x, _wrapper_get_high_threshold(x)))
+        assert _wrapper_get_high_threshold(x) != -255, "tmp{}: invalid high threshold".format(x)
+
+
+def test_for_temp_high_critical_threshold_read(json_config_data):
+    """Test Purpose:  Verify that high critical threshold of each Temp sensors defined in the platform config
+                      josn is able to read
+
+
+               Args:
+                    arg1 (json): platform-<sonic_platform>-config.json
+
+            Example:
+                    For a system that physically supports 4 TEMPs
+
+                    platform-<sonic_platform>-config.json
+                    {
+                         "PLATFORM": {
+                             num_temps": 4
+                         }
+                    }
+    """
+    if json_config_data['PLATFORM']['modules']['TEMP']['support'] == "false":
+       pytest.skip("Skip the testing due to the python module is not supported")
+
+    for x in range(json_config_data['PLATFORM']['num_temps']):
+        print("tmp{}: {}".format(x, _wrapper_get_high_critical_threshold(x)))
+        assert _wrapper_get_high_critical_threshold(x) != -255, "tmp{}: invalid high critical threshold".format(x)
+
 def test_for_thermal_daemon(json_config_data,json_test_data):
 
     if json_config_data['PLATFORM']['thermal_policy_support'] == "false":
@@ -172,7 +250,7 @@ def test_for_thermal_daemon(json_config_data,json_test_data):
                            close_fds=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT)
-    cnt = pin.communicate()[0]
+    cnt = pin.communicate()[0].decode('ascii')
     cp1.append(int(cnt))
     assert cp1, "flooding syslog [" + app + "] not detected"
 
@@ -199,7 +277,7 @@ def test_for_thermal_policy(json_config_data,json_test_data):
            duty = json_test_data['PLATFORM']['THERMAL_POLICY']['F2B'][str(index)][2]
 
 
-        if temp > high :
+        if temp_avg > high :
            continue
         else :
            assert duty == _wrapper_get_fan_duty(x), \
@@ -227,11 +305,6 @@ def test_for_thermal_policy_fan_removed(json_config_data,json_test_data):
 
     if json_config_data['PLATFORM']['thermal_policy_support'] == "false":
        pytest.skip("Skip the testing due to thermal policy not supported")
-
-
-    if _wrapper_init() is None:
-        pytest.skip("platform chassis not found")
-        return
 
     duty = json_test_data['PLATFORM']['THERMAL_POLICY']['FAN_REMOVED_DUTY']
 
@@ -275,8 +348,9 @@ def test_for_pmon_daemon(json_test_data):
         }
     """
     cp1 = []
+    cp2 = []
     pat = json_test_data["PLATFORM"]["PMON"]["syslog"]
-
+    
     for idx in range(len(pat)):
         cmd = "cat /var/log/syslog | grep -c -i " + "'" + pat[idx] + \
               " entered RUNNING state" + "'"
@@ -285,11 +359,22 @@ def test_for_pmon_daemon(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp1.append(int(cnt))
 
     for idx1 in range(len(pat)):
-        assert cp1[idx1] != 0, "pmon syslog [" + pat[idx1] + "] not detected"
+        cmd = "cat /var/log/ramfs/in-memory-syslog-info.log | grep -c -i " + "'" + pat[idx1] + \
+              " entered RUNNING state" + "'"
+        pin = subprocess.Popen(cmd,
+                               shell=True,
+                               close_fds=True,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+        cnt = pin.communicate()[0]
+        cp2.append(int(cnt))
+
+    for index in range(len(pat)):
+        assert cp1[index] != 0 or cp2[index] !=0, "pmon syslog [" + pat[index] + "] not detected"
 
 def test_for_pmon_fan_removed_event_log(json_config_data,json_test_data):
 
@@ -309,14 +394,14 @@ def test_for_pmon_fan_removed_event_log(json_config_data,json_test_data):
     for x in range(json_config_data['PLATFORM']['num_fans']):
         if _wrapper_get_fan_presence(x) == False:
            Fan_removed = True
-           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "FAN " + str(x+1) + \
-                 " removed" + "'"
+           fan_name = _wrapper_get_fan_name(x)
+           cmd = "cat /var/log/syslog | grep -c -i " + "'" + fan_name + " .*removed" + "'"
            pin = subprocess.Popen(cmd,
                                   shell=True,
                                   close_fds=True,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
-           cnt = pin.communicate()[0]
+           cnt = pin.communicate()[0].decode('ascii')
            assert int(cnt) != 0,\
                   "FAN" + str(x+1)+ "removed event log not detected"
 
@@ -339,15 +424,14 @@ def test_for_pmon_psu_removed_event_log(json_config_data,json_test_data):
 
     for x in range(json_config_data['PLATFORM']['num_psus']):
         if _wrapper_get_psus_presence(x) == False:
-           Psu_removed == True
-           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "PSU " + str(x+1) + \
-                 " removed" + "'"
+           Psu_removed = True
+           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "PSU " + str(x+1) + " .*is not present." + "'"
            pin = subprocess.Popen(cmd,
                                   shell=True,
                                   close_fds=True,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
-           cnt = pin.communicate()[0]
+           cnt = pin.communicate()[0].decode('ascii')
            assert int(cnt) != 0,\
                   "PSU" + str(x+1)+ "removed event log not detected"
 
