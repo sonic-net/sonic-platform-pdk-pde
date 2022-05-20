@@ -12,6 +12,8 @@ uint32_t portGetSpeed(sai_object_id_t port);
 sai_status_t portSetSpeed(sai_object_id_t port, uint32_t speed);
 uint64_t portGetCounter(sai_object_id_t port, sai_stat_id_t id);
 sai_status_t portClearCounter(sai_object_id_t port, sai_stat_id_t id);
+sai_status_t portSetAttribute(sai_object_id_t port, sai_attribute_t *attr);
+sai_status_t portGetAttribute(sai_object_id_t port, sai_attribute_t *attr);
 
 uint32_t switchGetPortNumber(void);
 sai_status_t switchShell(bool enable);
