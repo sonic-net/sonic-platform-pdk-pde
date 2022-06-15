@@ -4,6 +4,7 @@ import imp
 import subprocess
 import time
 
+PLATFORM_PATH = "/usr/share/sonic/platform"
 PLATFORM_SPECIFIC_MODULE_NAME = "eeprom"
 PLATFORM_SPECIFIC_CLASS_NAME = "board"
 
