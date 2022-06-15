@@ -9,8 +9,10 @@ DUTY_MAX = 100
 
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_MODULE_NAME = "fanutil"
-PLATFORM_SPECIFIC_CLASS_NAME = "FanUtil"
+PLATFORM_SPECIFIC_FAN_MODULE_NAME = "fanutil"
+PLATFORM_SPECIFIC_FAN_CLASS_NAME = "FanUtil"
+PLATFORM_SPECIFIC_PSU_MODULE_NAME = "psuutil"
+PLATFORM_SPECIFIC_PSU_CLASS_NAME = "PsuUtil"
 
 # Global platform-specific fanutil class instance
 platform_fanutil = None
@@ -33,14 +35,14 @@ def _wrapper_init():
     # Load platform-specific fanutil class
     if platform_chassis is None:
        try:
-             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-             platform_fanutil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
+             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_FAN_MODULE_NAME + ".py"])
+             module = imp.load_source(PLATFORM_SPECIFIC_FAN_MODULE_NAME, module_file)
+             platform_fanutil_class = getattr(module, PLATFORM_SPECIFIC_FAN_CLASS_NAME)
              platform_fanutil = platform_fanutil_class()
 
-             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-             platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
+             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_PSU_MODULE_NAME + ".py"])
+             module = imp.load_source(PLATFORM_SPECIFIC_PSU_MODULE_NAME, module_file)
+             platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_PSU_CLASS_NAME)
              platform_psuutil = platform_psuutil_class()
 
        except Exception as e:
