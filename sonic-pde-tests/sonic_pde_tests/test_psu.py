@@ -260,8 +260,8 @@ def test_for_psu_serial_num(json_config_data, json_test_data):
         for x in psupresentlist:
             if _wrapper_get_psus_status(x-1) :
                assert _wrapper_get_psus_serial(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['psu_serial_num'], \
-                      "Verify PSU{} Serail number {} is invalid".format(x, _wrapper_get_psus_serial(x-1))
-               assert is_valid_string(_wrapper_get_psus_serial(x-1)), "junk character detected"
+                      "Verify PSU{} Serial number {} is invalid".format(x, _wrapper_get_psus_serial(x-1))
+               assert is_valid_string(_wrapper_get_psus_serial(x-1)), "junk character in psu serial"
 
 
 def test_for_psu_model(json_config_data, json_test_data):
@@ -291,7 +291,7 @@ def test_for_psu_model(json_config_data, json_test_data):
             if _wrapper_get_psus_status(x-1):
                assert _wrapper_get_psus_model(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['model'], \
                       "Verify PSU{} Model ID {} is invalid".format(x, _wrapper_get_psus_model(x-1))
-               assert is_valid_string(_wrapper_get_psus_model(x-1)), "junk character detected"
+               assert is_valid_string(_wrapper_get_psus_model(x-1)), "junk character in psu model"
 
 def test_for_psu_voltage(json_config_data, json_test_data):
     """Test Purpose: Verify that the PSUs Output voltage is valid

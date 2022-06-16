@@ -237,7 +237,7 @@ def test_for_thermal_policy(json_config_data,json_test_data):
            high = json_test_data['PLATFORM']['THERMAL_POLICY']['F2B'][str(index)][1]
            duty = json_test_data['PLATFORM']['THERMAL_POLICY']['F2B'][str(index)][2]
 
-
+        #When average temp bigger than high temp will jump to next policy table 
         if temp_avg > high :
            continue
         else :
