@@ -140,7 +140,7 @@ def test_for_num_psus(json_config_data):
             }
         }
         """
-    assert _wrapper_get_num_psus() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} PSUs are supported in platform".format(platform_psuutil.get_num_psus())
+    assert _wrapper_get_num_psus() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} PSUs are supported in platform".format(_wrapper_get_num_psus())
 
 def test_for_psu_present(json_config_data, json_test_data):
     """Test Purpose:  Test Purpose: Verify that the PSUs that are present report as present in the PSU plugin.
