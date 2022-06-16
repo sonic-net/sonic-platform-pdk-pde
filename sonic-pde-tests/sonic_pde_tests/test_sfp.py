@@ -12,10 +12,8 @@ except ImportError as e:
     raise ImportError("%s - required module not found" % str(e))
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_MODULE_NAME = "sfputil"
-PLATFORM_SPECIFIC_CLASS_NAME = "SfpUtil"
 
-# Global platform-specific sfputil class instance
+# Global class instance
 platform_sfputil = None
 platform_chassis = None
 
@@ -23,7 +21,7 @@ platform_chassis = None
 port_dict = None
 first_phy_port =1
 
-# Loads platform specific module from source
+# Loads platform module from source
 def _wrapper_init():
     global platform_chassis
     global platform_sfputil
@@ -43,19 +41,6 @@ def _wrapper_init():
            platform_sfputil = sonic_platform_base.sonic_sfp.sfputilhelper.SfpUtilHelper()
        except Exception as e:
            print("Failed to load chassis due to {}".format(repr(e)))
-
-    # Load platform-specific fanutil class
-    if platform_chassis is None:
-       try:
-             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-             platform_sfputil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
-             platform_sfputil = platform_sfputil_class()
-       except Exception as e:
-             print("Failed to load sfputil due to {}".format(repr(e)))
-
-       assert (platform_chassis is not None) or (platform_sfputil is not None), "Unable to load platform module"
-
 
 # Get platform specific HwSKU path
 def get_hwsku_path():
@@ -113,83 +98,57 @@ def find_port_index_based():
 def _wrapper_is_qsfp_port(physical_port):
     _wrapper_init()
     find_port_index_based()
-    if platform_chassis is not None:
-       if "QSFP" in platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A"):
-          return True
+    if "QSFP" in platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A"):
+        return True
     else:
-       if physical_port in platform_sfputil.qsfp_ports:
-          return True
-    return False
-
+        return False
 
 def _wrapper_get_transceiver_info_type(physical_port):
     find_port_index_based()
-    if platform_chassis is not None:
-       try:
-           return platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A")
-       except NotImplementedError:
-           pass
-    return platform_sfputil.get_transceiver_info_dict(physical_port).get("type","N/A")
-
+    try:
+        return platform_chassis.get_sfp(physical_port).get_transceiver_info().get("type","N/A")
+    except NotImplementedError:
+        pass
 
 def _wrapper_get_num_sfps():
     _wrapper_init()
     load_platform_portdict()
-    if platform_chassis is not None:
-       try:
-           return platform_chassis.get_num_sfps()
-       except NotImplementedError:
-           pass
-
-    num = 0
-    for intf in natsorted(port_dict.keys()):
-        port = int(port_dict[intf]['index'])
-        if not platform_sfputil._is_valid_port(port):
-           continue
-        num += 1
-
-    return num
+    try:
+       return platform_chassis.get_num_sfps()
+    except NotImplementedError:
+       pass
 
 def _wrapper_get_presence(physical_port):
     _wrapper_init()
     find_port_index_based()
-    if platform_chassis is not None:
-       try:
-          return platform_chassis.get_sfp(physical_port).get_presence()
-       except NotImplementedError:
-          pass
-    return platform_sfputil.get_presence(physical_port)
+    try:
+       return platform_chassis.get_sfp(physical_port).get_presence()
+    except NotImplementedError:
+       pass
 
 def _wrapper_get_low_power_mode(physical_port):
     _wrapper_init()
     find_port_index_based()
-    if platform_chassis is not None:
-       try:
-          return platform_chassis.get_sfp(physical_port).get_lpmode()
-       except NotImplementedError:
-              pass
-    return platform_sfputil.get_low_power_mode(physical_port)
+    try:
+       return platform_chassis.get_sfp(physical_port).get_lpmode()
+    except NotImplementedError:
+       pass
 
 def _wrapper_set_low_power_mode(physical_port, enable):
     _wrapper_init()
     find_port_index_based()
-    if platform_chassis is not None:
-       try:
-           return platform_chassis.get_sfp(physical_port).set_lpmode(enable)
-       except NotImplementedError:
-           pass
-    return platform_sfputil.set_low_power_mode(physical_port, enable)
+    try:
+       return platform_chassis.get_sfp(physical_port).set_lpmode(enable)
+    except NotImplementedError:
+       pass
 
 def _wrapper_reset(physical_port):
     _wrapper_init()
     find_port_index_based()
-    if platform_chassis is not None:
-       try:
-           return platform_chassis.get_sfp(physical_port).reset()
-       except NotImplementedError:
-           pass
-    return platform_sfputil.reset(physical_port)
-
+    try:
+       return platform_chassis.get_sfp(physical_port).reset()
+    except NotImplementedError:
+       pass
 
 # Test for SFP port number
 def test_for_sfp_number(json_config_data):

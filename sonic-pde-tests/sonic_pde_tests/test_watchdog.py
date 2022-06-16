@@ -4,15 +4,12 @@ import imp
 import subprocess
 import time
 
-PLATFORM_SPECIFIC_MODULE_NAME = "watchdog"
-PLATFORM_SPECIFIC_CLASS_NAME = "Watchdog"
-
 VERSION = "1.0"
 WATCHDOG_LOAD_ERROR = -1
 CHASSIS_LOAD_ERROR = -2
 WDT_COMMON_ERROR = -1
 
-# Global platform-specific watchdog class instance
+# Global platform watchdog class instance
 platform_watchdog = None
 platform_chassis = None
 
@@ -32,23 +29,6 @@ def load_platform_watchdog():
 
        except Exception as e:
             print("Failed to load 2.0 watchdog API due to {}".format(repr(e)))
-
-        
-    # Load 1.0 watchdog class
-    if platform_chassis is None:
-
-       try:
-            # Load the helper class
-            helper = UtilHelper()
-            platform_watchdog = helper.load_platform_util(PLATFORM_SPECIFIC_MODULE_NAME, PLATFORM_SPECIFIC_CLASS_NAME)
-            platform_chassis = platform_watchdog
-            if not platform_watchdog:
-                print("Failed to get 1.0 watchdog module")
-
-       except Exception as e:
-            print("1.0 watchdog API class is not supported due to {}".format(repr(e)))
-
-
 
 def _wrapper_get_watchdog_dev():
     load_platform_watchdog()

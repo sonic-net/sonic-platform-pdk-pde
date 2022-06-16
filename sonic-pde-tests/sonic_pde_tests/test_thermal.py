@@ -5,20 +5,10 @@ import subprocess
 import time
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_PSU_MODULE_NAME = "psuutil"
-PLATFORM_SPECIFIC_PSU_CLASS_NAME = "PsuUtil"
-PLATFORM_SPECIFIC_FAN_MODULE_NAME = "fanutil"
-PLATFORM_SPECIFIC_FAN_CLASS_NAME = "FanUtil"
-
-platform_psuutil = None
 platform_chassis = None
-platform_fanutil = None
 
-# wrappers that are compliable with both new platform api and old-style plugin
 def _wrapper_init():
     global platform_chassis
-    global platform_psuutil
-    global platform_fanutil
 
     # Load new platform api class
     if platform_chassis is None:
@@ -27,29 +17,6 @@ def _wrapper_init():
             platform_chassis = sonic_platform.platform.Platform().get_chassis()
         except Exception as e:
             print("Failed to load chassis due to {}".format(repr(e)))
-
-    # Load platform-specific psuutil class
-    if platform_chassis is None:
-        try:
-            module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_PSU_MODULE_NAME + ".py"])
-            module = imp.load_source(PLATFORM_SPECIFIC_PSU_MODULE_NAME, module_file)
-            platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_PSU_CLASS_NAME)
-            platform_psuutil = platform_psuutil_class()
-        except Exception as e:
-            print("Failed to load psuutil due to {}".format(repr(e)))
-
-    # Load platform-specific fanutil class
-        try:
-            module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_FAN_MODULE_NAME + ".py"])
-            module = imp.load_source(PLATFORM_SPECIFIC_FAN_MODULE_NAME, module_file)
-            platform_fanutil_class = getattr(module, PLATFORM_SPECIFIC_FAN_CLASS_NAME)
-            platform_fanutil = platform_fanutil_class()
-        except Exception as e:
-            print("Failed to load fanutil due to {}".format(repr(e)))
-
-    assert (platform_chassis is not None) or (platform_psuutil is not None) or \
-           (platform_fanutil is not None) , "Unable to load platform module"
-
 
 def _wrapper_get_num_temp():
     _wrapper_init()
@@ -91,48 +58,42 @@ def _wrapper_get_high_critical_threshold(index):
 def _wrapper_get_fan_name(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_name()
-        except NotImplementedError:
-            pass
-    return "FAN {}".format(index+1)
+       try:
+          return platform_chassis.get_fan(index).get_name()
+       except NotImplementedError:
+          pass
+
 def _wrapper_get_fan_presence(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_presence()
-        except NotImplementedError:
-            pass
-    return platform_fanutil.get_presence(index+1)
+       try:
+           return platform_chassis.get_fan(index).get_presence()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_fan_duty(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_target_speed()
-        except NotImplementedError:
-            pass
-    return platform_fanutil.get_speed(index+1)
+       try:
+          return platform_chassis.get_fan(index).get_target_speed()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_fan_direction(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_direction()
-        except NotImplementedError:
-            pass
-    return platform_fanutil.get_direction(index+1)
+       try:
+           return platform_chassis.get_fan(index).get_direction()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_presence(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_psu(index).get_presence()
-        except NotImplementedError:
-            pass
-    return platform_psuutil.get_psu_presence(index+1)
-
-
+       try:
+           return platform_chassis.get_psu(index).get_presence()
+       except NotImplementedError:
+           pass
 
 # test cases
 def test_for_num_temp(json_config_data):

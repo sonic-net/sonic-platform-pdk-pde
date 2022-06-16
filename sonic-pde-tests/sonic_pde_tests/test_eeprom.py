@@ -5,17 +5,15 @@ import subprocess
 import time
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_MODULE_NAME = "eeprom"
-PLATFORM_SPECIFIC_CLASS_NAME = "board"
 
 
-# Global platform-specific sfputil class instance
+# Global platform class instance
 platform_eeprom_data = None
 platform_eeprom = None
 platform_chassis = None
 
 
-# Loads platform specific module from source
+# Loads platform module from source
 def _wrapper_init():
     global platform_chassis
     global platform_eeprom
@@ -30,21 +28,6 @@ def _wrapper_init():
            platform_eeprom_data = platform_eeprom.read_eeprom()
        except Exception as e:
            print("Failed to load chassis due to {}".format(repr(e)))
-
-    # Load platform-specific fanutil class
-    if platform_chassis is None:
-       try:
-             module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-             module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-             platform_eeprom_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
-             platform_eeprom = platform_eeprom_class()
-             platform_eeprom_data = platform_eeprom.read_eeprom()
-
-       except Exception as e:
-             print("Failed to load eeprom due to {}".format(repr(e)))
-
-       assert (platform_chassis is not None) or (platform_eeprom is not None), "Unable to load platform module"
-
 
 def is_valid_string(str):
     for c in str:

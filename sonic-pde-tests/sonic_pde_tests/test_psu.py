@@ -5,151 +5,117 @@ import subprocess
 import time
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_MODULE_NAME = "psuutil"
-PLATFORM_SPECIFIC_CLASS_NAME = "PsuUtil"
 
-platform_psuutil = None
+# Global platform class instance
 platform_chassis = None
 
-# Loads platform specific module from source
+# Loads platform module from source
 def _wrapper_init():
-    global platform_psuutil
     global platform_chassis
 
     # Load new platform api class
     if platform_chassis is None:
-        try:
-            import sonic_platform.platform
-            platform_chassis = sonic_platform.platform.Platform().get_chassis()
-        except Exception as e:
-            print("Failed to load chassis due to {}".format(repr(e)))
+       try:
+           import sonic_platform.platform
+           platform_chassis = sonic_platform.platform.Platform().get_chassis()
+       except Exception as e:
+           print("Failed to load chassis due to {}".format(repr(e)))
 
-    # Load platform-specific psuutil class
-    if platform_chassis is None:
-        try:
-            module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_MODULE_NAME + ".py"])
-            module = imp.load_source(PLATFORM_SPECIFIC_MODULE_NAME, module_file)
-            platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_CLASS_NAME)
-            platform_psuutil = platform_psuutil_class()
-        except Exception as e:
-            print("Failed to load psuutil due to {}".format(repr(e)))
-
-    assert (platform_chassis is not None) or (platform_psuutil is not None), "Unable to load platform module"
-
-# wrappers that are compliable with both new platform api and old-style plugin
 def _wrapper_get_num_psus():
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_num_psus()
-        except NotImplementedError:
-            pass
-    return platform_psuutil.get_num_psus()
+       try:
+           return platform_chassis.get_num_psus()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_presence(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_psu(psu_index).get_presence()
-        except NotImplementedError:
-            pass
-    return platform_psuutil.get_psu_presence(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_presence()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_status(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_psu(psu_index).get_powergood_status()
-        except NotImplementedError:
-            pass
-    return platform_psuutil.get_psu_status(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_powergood_status()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_serial(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_serial()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_serial(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_serial()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_model(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_model()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_model(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_model()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_power(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_power()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_output_power(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_power()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_current(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_current()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_output_current(psu_index+1)
+       try:
+           return platform_chassis.get_psu(psu_index).get_current()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_psus_voltage(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_voltage()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_output_voltage(psu_index+1)
+       try:
+          return platform_chassis.get_psu(psu_index).get_voltage()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_psus_input_voltage(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_input_voltage()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_input_voltage(psu_index+1)
+       try:
+          return platform_chassis.get_psu(psu_index).get_input_voltage()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_psus_input_current(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_input_current()
-         except NotImplementedError:
-             pass
-    _wrapper_init()
-    if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_input_current()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_input_current(psu_index+1)
+       try:
+          return platform_chassis.get_psu(psu_index).get_input_current()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_psus_type(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_type()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_type(psu_index+1)
+       try:
+          return platform_chassis.get_psu(psu_index).get_type()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_psus_capacity(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
-         try:
-             return platform_chassis.get_psu(psu_index).get_capacity()
-         except NotImplementedError:
-             pass
-    return platform_psuutil.get_capacity(psu_index+1)
+       try:
+          return platform_chassis.get_psu(psu_index).get_capacity()
+       except NotImplementedError:
+          pass
 
 def is_valid_string(str):
     for c in str:
