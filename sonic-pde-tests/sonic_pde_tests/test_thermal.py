@@ -323,19 +323,8 @@ def test_for_pmon_daemon(json_test_data):
         cnt = pin.communicate()[0].decode('ascii')
         cp1.append(int(cnt))
 
-    for idx1 in range(len(pat)):
-        cmd = "cat /var/log/ramfs/in-memory-syslog-info.log | grep -c -i " + "'" + pat[idx1] + \
-              " entered RUNNING state" + "'"
-        pin = subprocess.Popen(cmd,
-                               shell=True,
-                               close_fds=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
-        cp2.append(int(cnt))
-
     for index in range(len(pat)):
-        assert cp1[index] != 0 or cp2[index] !=0, "pmon syslog [" + pat[index] + "] not detected"
+        assert cp1[index] != 0, "pmon syslog [" + pat[index] + "] not detected"
 
 def test_for_pmon_fan_removed_event_log(json_config_data,json_test_data):
 
