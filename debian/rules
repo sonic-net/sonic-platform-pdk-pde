@@ -2,7 +2,7 @@
 
 PACKAGE_NAME := sonic-platform-pde
 TOPDIR := $(shell pwd)
-PYTHON ?= python2
+PYTHON ?= python3
 
 %:
 	dh $@

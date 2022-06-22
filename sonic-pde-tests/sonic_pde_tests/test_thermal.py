@@ -5,20 +5,10 @@ import subprocess
 import time
 
 PLATFORM_PATH = "/usr/share/sonic/platform"
-PLATFORM_SPECIFIC_PSU_MODULE_NAME = "psuutil"
-PLATFORM_SPECIFIC_PSU_CLASS_NAME = "PsuUtil"
-PLATFORM_SPECIFIC_FAN_MODULE_NAME = "fanutil"
-PLATFORM_SPECIFIC_FAN_CLASS_NAME = "FanUtil"
-
-platform_psuutil = None
 platform_chassis = None
-platform_fanutil = None
 
-# wrappers that are compliable with both new platform api and old-style plugin
 def _wrapper_init():
     global platform_chassis
-    global platform_psuutil
-    global platform_fanutil
 
     # Load new platform api class
     if platform_chassis is None:
@@ -27,29 +17,6 @@ def _wrapper_init():
             platform_chassis = sonic_platform.platform.Platform().get_chassis()
         except Exception as e:
             print("Failed to load chassis due to {}".format(repr(e)))
-
-    # Load platform-specific psuutil class
-    if platform_chassis is None:
-        try:
-            module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_PSU_MODULE_NAME + ".py"])
-            module = imp.load_source(PLATFORM_SPECIFIC_PSU_MODULE_NAME, module_file)
-            platform_psuutil_class = getattr(module, PLATFORM_SPECIFIC_PSU_CLASS_NAME)
-            platform_psuutil = platform_psuutil_class()
-        except Exception as e:
-            print("Failed to load psuutil due to {}".format(repr(e)))
-
-    # Load platform-specific fanutil class
-        try:
-            module_file = "/".join([PLATFORM_PATH, "plugins", PLATFORM_SPECIFIC_FAN_MODULE_NAME + ".py"])
-            module = imp.load_source(PLATFORM_SPECIFIC_FAN_MODULE_NAME, module_file)
-            platform_fanutil_class = getattr(module, PLATFORM_SPECIFIC_FAN_CLASS_NAME)
-            platform_fanutil = platform_fanutil_class()
-        except Exception as e:
-            print("Failed to load fanutil due to {}".format(repr(e)))
-
-    assert (platform_chassis is not None) or (platform_psuutil is not None) or \
-           (platform_fanutil is not None) , "Unable to load platform module"
-
 
 def _wrapper_get_num_temp():
     _wrapper_init()
@@ -69,43 +36,64 @@ def _wrapper_get_temperature(index):
             pass
     return -255
 
-def _wrapper_get_fan_presence(index):
+
+def _wrapper_get_high_threshold(index):
     _wrapper_init()
     if platform_chassis is not None:
         try:
-            return platform_chassis.get_fan(index).get_presence()
+            return platform_chassis.get_thermal(index).get_high_threshold()
         except NotImplementedError:
             pass
-    return platform_fanutil.get_presence(index+1)
+    return -255
+
+def _wrapper_get_high_critical_threshold(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+        try:
+            return platform_chassis.get_thermal(index).get_high_critical_threshold()
+        except NotImplementedError:
+            pass
+    return -255
+
+def _wrapper_get_fan_name(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+       try:
+          return platform_chassis.get_fan(index).get_name()
+       except NotImplementedError:
+          pass
+
+def _wrapper_get_fan_presence(index):
+    _wrapper_init()
+    if platform_chassis is not None:
+       try:
+           return platform_chassis.get_fan(index).get_presence()
+       except NotImplementedError:
+           pass
 
 def _wrapper_get_fan_duty(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_target_speed()
-        except NotImplementedError:
-            pass
-    return platform_fanutil.get_speed(index+1)
+       try:
+          return platform_chassis.get_fan(index).get_target_speed()
+       except NotImplementedError:
+          pass
 
 def _wrapper_get_fan_direction(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_fan(index).get_direction()
-        except NotImplementedError:
-            pass
-    return platform_fanutil.get_direction(index+1)
+       try:
+           return platform_chassis.get_fan(index).get_direction()
+       except NotImplementedError:
+           pass
 
-def _wrapper_get_psus_presence(index):
+def _wrapper_get_psu_presence(index):
     _wrapper_init()
     if platform_chassis is not None:
-        try:
-            return platform_chassis.get_psu(index).get_presence()
-        except NotImplementedError:
-            pass
-    return platform_psuutil.get_psu_presence(index+1)
-
-
+       try:
+           return platform_chassis.get_psu(index).get_presence()
+       except NotImplementedError:
+           pass
 
 # test cases
 def test_for_num_temp(json_config_data):
@@ -157,6 +145,57 @@ def test_for_temp_read(json_config_data):
         assert _wrapper_get_temperature(x) != -255, "tmp{}: invalid temperature".format(x)
 
 
+def test_for_temp_high_threshold_read(json_config_data):
+    """Test Purpose:  Verify that high threshold of each Temp sensors defined in the platform config
+                      josn is able to read
+
+
+               Args:
+                    arg1 (json): platform-<sonic_platform>-config.json
+
+            Example:
+                    For a system that physically supports 4 TEMPs
+
+                    platform-<sonic_platform>-config.json
+                    {
+                         "PLATFORM": {
+                             num_temps": 4
+                         }
+                    }
+    """
+    if json_config_data['PLATFORM']['modules']['TEMP']['support'] == "false":
+       pytest.skip("Skip the testing due to the python module is not supported")
+
+    for x in range(json_config_data['PLATFORM']['num_temps']):
+        print("tmp{}: {}".format(x, _wrapper_get_high_threshold(x)))
+        assert _wrapper_get_high_threshold(x) != -255, "tmp{}: invalid high threshold".format(x)
+
+
+def test_for_temp_high_critical_threshold_read(json_config_data):
+    """Test Purpose:  Verify that high critical threshold of each Temp sensors defined in the platform config
+                      josn is able to read
+
+
+               Args:
+                    arg1 (json): platform-<sonic_platform>-config.json
+
+            Example:
+                    For a system that physically supports 4 TEMPs
+
+                    platform-<sonic_platform>-config.json
+                    {
+                         "PLATFORM": {
+                             num_temps": 4
+                         }
+                    }
+    """
+    if json_config_data['PLATFORM']['modules']['TEMP']['support'] == "false":
+       pytest.skip("Skip the testing due to the python module is not supported")
+
+    for x in range(json_config_data['PLATFORM']['num_temps']):
+        print("tmp{}: {}".format(x, _wrapper_get_high_critical_threshold(x)))
+        assert _wrapper_get_high_critical_threshold(x) != -255, "tmp{}: invalid high critical threshold".format(x)
+
 def test_for_thermal_daemon(json_config_data,json_test_data):
 
     if json_config_data['PLATFORM']['thermal_policy_support'] == "false":
@@ -172,7 +211,7 @@ def test_for_thermal_daemon(json_config_data,json_test_data):
                            close_fds=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT)
-    cnt = pin.communicate()[0]
+    cnt = pin.communicate()[0].decode('ascii')
     cp1.append(int(cnt))
     assert cp1, "flooding syslog [" + app + "] not detected"
 
@@ -198,8 +237,8 @@ def test_for_thermal_policy(json_config_data,json_test_data):
            high = json_test_data['PLATFORM']['THERMAL_POLICY']['F2B'][str(index)][1]
            duty = json_test_data['PLATFORM']['THERMAL_POLICY']['F2B'][str(index)][2]
 
-
-        if temp > high :
+        #When average temp bigger than high temp will jump to next policy table 
+        if temp_avg > high :
            continue
         else :
            assert duty == _wrapper_get_fan_duty(x), \
@@ -227,11 +266,6 @@ def test_for_thermal_policy_fan_removed(json_config_data,json_test_data):
 
     if json_config_data['PLATFORM']['thermal_policy_support'] == "false":
        pytest.skip("Skip the testing due to thermal policy not supported")
-
-
-    if _wrapper_init() is None:
-        pytest.skip("platform chassis not found")
-        return
 
     duty = json_test_data['PLATFORM']['THERMAL_POLICY']['FAN_REMOVED_DUTY']
 
@@ -275,8 +309,9 @@ def test_for_pmon_daemon(json_test_data):
         }
     """
     cp1 = []
+    cp2 = []
     pat = json_test_data["PLATFORM"]["PMON"]["syslog"]
-
+    
     for idx in range(len(pat)):
         cmd = "cat /var/log/syslog | grep -c -i " + "'" + pat[idx] + \
               " entered RUNNING state" + "'"
@@ -285,11 +320,11 @@ def test_for_pmon_daemon(json_test_data):
                                close_fds=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        cnt = pin.communicate()[0]
+        cnt = pin.communicate()[0].decode('ascii')
         cp1.append(int(cnt))
 
-    for idx1 in range(len(pat)):
-        assert cp1[idx1] != 0, "pmon syslog [" + pat[idx1] + "] not detected"
+    for index in range(len(pat)):
+        assert cp1[index] != 0, "pmon syslog [" + pat[index] + "] not detected"
 
 def test_for_pmon_fan_removed_event_log(json_config_data,json_test_data):
 
@@ -309,14 +344,14 @@ def test_for_pmon_fan_removed_event_log(json_config_data,json_test_data):
     for x in range(json_config_data['PLATFORM']['num_fans']):
         if _wrapper_get_fan_presence(x) == False:
            Fan_removed = True
-           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "FAN " + str(x+1) + \
-                 " removed" + "'"
+           fan_name = _wrapper_get_fan_name(x)
+           cmd = "cat /var/log/syslog | grep -c -i " + "'" + fan_name + " .*removed" + "'"
            pin = subprocess.Popen(cmd,
                                   shell=True,
                                   close_fds=True,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
-           cnt = pin.communicate()[0]
+           cnt = pin.communicate()[0].decode('ascii')
            assert int(cnt) != 0,\
                   "FAN" + str(x+1)+ "removed event log not detected"
 
@@ -338,16 +373,15 @@ def test_for_pmon_psu_removed_event_log(json_config_data,json_test_data):
     Psu_removed = False
 
     for x in range(json_config_data['PLATFORM']['num_psus']):
-        if _wrapper_get_psus_presence(x) == False:
-           Psu_removed == True
-           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "PSU " + str(x+1) + \
-                 " removed" + "'"
+        if _wrapper_get_psu_presence(x) == False:
+           Psu_removed = True
+           cmd = "cat /var/log/syslog | grep -c -i " + "'" + "PSU " + str(x+1) + " .*is not present." + "'"
            pin = subprocess.Popen(cmd,
                                   shell=True,
                                   close_fds=True,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
-           cnt = pin.communicate()[0]
+           cnt = pin.communicate()[0].decode('ascii')
            assert int(cnt) != 0,\
                   "PSU" + str(x+1)+ "removed event log not detected"
 

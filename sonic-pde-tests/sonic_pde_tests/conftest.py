@@ -26,10 +26,10 @@ def get_onie_pname():
                            close_fds=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT)
-    id = pin.communicate()[0]
+    id = pin.communicate()[0].decode('ascii')
     id = id.strip()
     return id
-	
+
 # Copy template platform config JSON to targeted platform JSON
 def create_platform_json(Pfname):
     INPUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,7 +40,7 @@ def create_platform_json(Pfname):
                      close_fds=True,
                      stdout=subprocess.PIPE,
                       stderr=subprocess.STDOUT)
-					  
+
 # Copy template platform test JSON to targeted platform JSON
 def create_test_json(Tfname):
     INPUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -51,7 +51,7 @@ def create_test_json(Tfname):
                      close_fds=True,
                      stdout=subprocess.PIPE,
                      stderr=subprocess.STDOUT)
-					 
+
 def pytest_runtest_setup(item):
     INPUT_DIR = os.path.dirname(os.path.abspath(__file__))
     Pfname = os.path.join(INPUT_DIR, 'data/platform', "platform-" + get_onie_pname() + "-config.json")
@@ -64,7 +64,7 @@ def pytest_runtest_setup(item):
        return
     else:
        create_test_json(Tfname)
-	   
+
 @pytest.fixture(scope='function',autouse='True')
 def json_config_data():
     """ Loads json file """
@@ -92,4 +92,3 @@ def json_test_data():
              contents=json.load(file_object)
 
     return contents
-

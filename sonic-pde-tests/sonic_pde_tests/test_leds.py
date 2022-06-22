@@ -28,7 +28,7 @@ def load_platform_sysledutil(json_config_data):
         platform_sysledutil_class = getattr(platform_sysledutil_module,class_name)
         platform_sysledutil = platform_sysledutil_class()
 
-    except AttributeError, e:
+    except AttributeError as e:
         print("Failed to instantiate '%s' class: %s" % (class_name, str(e)), True)
 
     return

@@ -2,7 +2,8 @@ SAI_INC := /usr/include/sai
 SAI_LIB := /usr/lib
 
 CC      := gcc
-CFLAGS  := -fPIC -I/usr/include/python2.7 -I$(SAI_INC)
+CFLAGS  := -fPIC -I/usr/include/python3.9 -I$(SAI_INC) -I$(SAI_INC)/experimental
+
 LDFLAGS := -L$(SAI_LIB) -lsai
 
 all: _saiut.so
