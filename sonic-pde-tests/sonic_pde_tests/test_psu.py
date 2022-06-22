@@ -21,15 +21,15 @@ def _wrapper_init():
        except Exception as e:
            print("Failed to load chassis due to {}".format(repr(e)))
 
-def _wrapper_get_num_psus():
+def _wrapper_get_num_psu():
     _wrapper_init()
     if platform_chassis is not None:
        try:
-           return platform_chassis.get_num_psus()
+           return platform_chassis.get_num_psu()
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_presence(psu_index):
+def _wrapper_get_psu_presence(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -37,7 +37,7 @@ def _wrapper_get_psus_presence(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_status(psu_index):
+def _wrapper_get_psu_status(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -45,7 +45,7 @@ def _wrapper_get_psus_status(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_serial(psu_index):
+def _wrapper_get_psu_serial(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -53,7 +53,7 @@ def _wrapper_get_psus_serial(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_model(psu_index):
+def _wrapper_get_psu_model(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -61,7 +61,7 @@ def _wrapper_get_psus_model(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_power(psu_index):
+def _wrapper_get_psu_power(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -69,7 +69,7 @@ def _wrapper_get_psus_power(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_current(psu_index):
+def _wrapper_get_psu_current(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -77,7 +77,7 @@ def _wrapper_get_psus_current(psu_index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_voltage(psu_index):
+def _wrapper_get_psu_voltage(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -85,7 +85,7 @@ def _wrapper_get_psus_voltage(psu_index):
        except NotImplementedError:
           pass
 
-def _wrapper_get_psus_input_voltage(psu_index):
+def _wrapper_get_psu_input_voltage(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -93,7 +93,7 @@ def _wrapper_get_psus_input_voltage(psu_index):
        except NotImplementedError:
           pass
 
-def _wrapper_get_psus_input_current(psu_index):
+def _wrapper_get_psu_input_current(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -101,7 +101,7 @@ def _wrapper_get_psus_input_current(psu_index):
        except NotImplementedError:
           pass
 
-def _wrapper_get_psus_type(psu_index):
+def _wrapper_get_psu_type(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -109,7 +109,7 @@ def _wrapper_get_psus_type(psu_index):
        except NotImplementedError:
           pass
 
-def _wrapper_get_psus_capacity(psu_index):
+def _wrapper_get_psu_capacity(psu_index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -140,7 +140,7 @@ def test_for_num_psus(json_config_data):
             }
         }
         """
-    assert _wrapper_get_num_psus() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} PSUs are supported in platform".format(_wrapper_get_num_psus())
+    assert _wrapper_get_num_psu() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} psu are supported in platform".format(_wrapper_get_num_psu())
 
 def test_for_psu_present(json_config_data, json_test_data):
     """Test Purpose:  Test Purpose: Verify that the PSUs that are present report as present in the PSU plugin.
@@ -168,7 +168,7 @@ def test_for_psu_present(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            assert _wrapper_get_psus_presence(x-1) == True, "System plugin reported PSU {} was not present".format(x)
+            assert _wrapper_get_psu_presence(x-1) == True, "System plugin reported PSU {} was not present".format(x)
 
 def test_for_psu_notpresent(json_config_data, json_test_data):
     """Test Purpose: Verify that the PSUs that are not present report as not present in the PSU plugin.
@@ -191,10 +191,10 @@ def test_for_psu_notpresent(json_config_data, json_test_data):
        }
 
     """
-    num_psus = _wrapper_get_num_psus()
+    num_psus = _wrapper_get_num_psu()
     for key in json_config_data:
         for x in range (1, num_psus):
-            if _wrapper_get_psus_presence(x-1) == True:
+            if _wrapper_get_psu_presence(x-1) == True:
                 Found = False;
             for y in json_test_data[key]['PSU']['present']:
                 if x == y:
@@ -230,7 +230,7 @@ def test_for_psu_status(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            assert _wrapper_get_psus_status(x-1) == json_test_data[key]['PSU']['status'][x-1], "System plugin reported PSU{} state did not match test state {}".format(x, json_test_data[key]['PSU']['status'])
+            assert _wrapper_get_psu_status(x-1) == json_test_data[key]['PSU']['status'][x-1], "System plugin reported PSU{} state did not match test state {}".format(x, json_test_data[key]['PSU']['status'])
 
 
 
@@ -258,10 +258,10 @@ def test_for_psu_serial_num(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1) :
-               assert _wrapper_get_psus_serial(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['psu_serial_num'], \
-                      "Verify PSU{} Serial number {} is invalid".format(x, _wrapper_get_psus_serial(x-1))
-               assert is_valid_string(_wrapper_get_psus_serial(x-1)), "junk character in psu serial"
+            if _wrapper_get_psu_status(x-1) :
+               assert _wrapper_get_psu_serial(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['psu_serial_num'], \
+                      "Verify PSU{} Serial number {} is invalid".format(x, _wrapper_get_psu_serial(x-1))
+               assert is_valid_string(_wrapper_get_psu_serial(x-1)), "junk character in psu serial"
 
 
 def test_for_psu_model(json_config_data, json_test_data):
@@ -288,10 +288,10 @@ def test_for_psu_model(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_model(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['model'], \
-                      "Verify PSU{} Model ID {} is invalid".format(x, _wrapper_get_psus_model(x-1))
-               assert is_valid_string(_wrapper_get_psus_model(x-1)), "junk character in psu model"
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_model(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['model'], \
+                      "Verify PSU{} Model ID {} is invalid".format(x, _wrapper_get_psu_model(x-1))
+               assert is_valid_string(_wrapper_get_psu_model(x-1)), "junk character in psu model"
 
 def test_for_psu_voltage(json_config_data, json_test_data):
     """Test Purpose: Verify that the PSUs Output voltage is valid
@@ -317,12 +317,12 @@ def test_for_psu_voltage(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_voltage(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_voltage'] * 1.1, \
-                      "Verify PSU{} Output voltage {} is either invalid or too high".format(x, _wrapper_get_psus_voltage(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_voltage(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_voltage'] * 1.1, \
+                      "Verify PSU{} Output voltage {} is either invalid or too high".format(x, _wrapper_get_psu_voltage(x-1))
 
-               assert _wrapper_get_psus_voltage(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_voltage'] * 0.9, \
-                      "Verify PSU{} Output voltage {} is either invalid or too low".format(x, _wrapper_get_psus_voltage(x-1))
+               assert _wrapper_get_psu_voltage(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_voltage'] * 0.9, \
+                      "Verify PSU{} Output voltage {} is either invalid or too low".format(x, _wrapper_get_psu_voltage(x-1))
 
 
 def test_for_psu_current(json_config_data, json_test_data):
@@ -340,12 +340,12 @@ def test_for_psu_current(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_current(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_current'] * 1.1, \
-                      "Verify PSU{} Output current {} is either invalid or too high".format(x, _wrapper_get_psus_current(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_current(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_current'] * 1.1, \
+                      "Verify PSU{} Output current {} is either invalid or too high".format(x, _wrapper_get_psu_current(x-1))
 
-               assert _wrapper_get_psus_current(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_current'] * 0.9, \
-                      "Verify PSU{} Output current {} is either invalid or too low".format(x, _wrapper_get_psus_current(x-1))
+               assert _wrapper_get_psu_current(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_current'] * 0.9, \
+                      "Verify PSU{} Output current {} is either invalid or too low".format(x, _wrapper_get_psu_current(x-1))
 
 
 
@@ -364,12 +364,12 @@ def test_for_psu_power(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_power(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_power'] * 1.1, \
-                      "Verify PSU{} Output Power {} is invalid too high".format(x, _wrapper_get_psus_power(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_power(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['output_power'] * 1.1, \
+                      "Verify PSU{} Output Power {} is invalid too high".format(x, _wrapper_get_psu_power(x-1))
 
-               assert _wrapper_get_psus_power(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_power'] * 0.9, \
-                      "Verify PSU{} Output Power {} is invalid too low".format(x, _wrapper_get_psus_power(x-1))
+               assert _wrapper_get_psu_power(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['output_power'] * 0.9, \
+                      "Verify PSU{} Output Power {} is invalid too low".format(x, _wrapper_get_psu_power(x-1))
 
 
 def test_for_psu_input_voltage(json_config_data, json_test_data):
@@ -396,12 +396,12 @@ def test_for_psu_input_voltage(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_input_voltage(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['input_voltage'] * 1.1, \
-                      "Verify PSU{} Input voltage {} is either invalid or too high".format(x, _wrapper_get_psus_input_voltage(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_input_voltage(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['input_voltage'] * 1.1, \
+                      "Verify PSU{} Input voltage {} is either invalid or too high".format(x, _wrapper_get_psu_input_voltage(x-1))
 
-               assert _wrapper_get_psus_input_voltage(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['input_voltage'] * 0.9, \
-                      "Verify PSU{} Input voltage {} is either invalid or too low".format(x, _wrapper_get_psus_input_voltage(x-1))
+               assert _wrapper_get_psu_input_voltage(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['input_voltage'] * 0.9, \
+                      "Verify PSU{} Input voltage {} is either invalid or too low".format(x, _wrapper_get_psu_input_voltage(x-1))
                       
                       
 def test_for_psu_input_current(json_config_data, json_test_data):
@@ -419,12 +419,12 @@ def test_for_psu_input_current(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_input_current(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['input_current'] * 1.1, \
-                      "Verify PSU{} Input current {} is either invalid or too high".format(x, _wrapper_get_psus_input_current(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_input_current(x-1) <= json_test_data[key]['PSU']['PSU'+str(x)]['input_current'] * 1.1, \
+                      "Verify PSU{} Input current {} is either invalid or too high".format(x, _wrapper_get_psu_input_current(x-1))
 
-               assert _wrapper_get_psus_input_current(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['input_current'] * 0.9, \
-                      "Verify PSU{} Input current {} is either invalid or too low".format(x, _wrapper_get_psus_input_current(x-1))
+               assert _wrapper_get_psu_input_current(x-1) >= json_test_data[key]['PSU']['PSU'+str(x)]['input_current'] * 0.9, \
+                      "Verify PSU{} Input current {} is either invalid or too low".format(x, _wrapper_get_psu_input_current(x-1))
 
 
 
@@ -452,9 +452,9 @@ def test_for_psu_capacity(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_capacity(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['capacity'], \
-                      "Verify PSU{} Capacity {} is invalid".format(x, _wrapper_get_psus_capacity(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_capacity(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['capacity'], \
+                      "Verify PSU{} Capacity {} is invalid".format(x, _wrapper_get_psu_capacity(x-1))
 
 
 
@@ -482,6 +482,6 @@ def test_for_psu_type(json_config_data, json_test_data):
     for key in json_config_data:
         psupresentlist = json_test_data[key]['PSU']['present']
         for x in psupresentlist:
-            if _wrapper_get_psus_status(x-1):
-               assert _wrapper_get_psus_type(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['type'], \
-                      "Verify PSU{} Type {} is invalid".format(x, _wrapper_get_psus_type(x-1))
+            if _wrapper_get_psu_status(x-1):
+               assert _wrapper_get_psu_type(x-1) == json_test_data[key]['PSU']['PSU'+str(x)]['type'], \
+                      "Verify PSU{} Type {} is invalid".format(x, _wrapper_get_psu_type(x-1))

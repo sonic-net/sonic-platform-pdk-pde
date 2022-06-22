@@ -87,7 +87,7 @@ def _wrapper_get_fan_direction(index):
        except NotImplementedError:
            pass
 
-def _wrapper_get_psus_presence(index):
+def _wrapper_get_psu_presence(index):
     _wrapper_init()
     if platform_chassis is not None:
        try:
@@ -373,7 +373,7 @@ def test_for_pmon_psu_removed_event_log(json_config_data,json_test_data):
     Psu_removed = False
 
     for x in range(json_config_data['PLATFORM']['num_psus']):
-        if _wrapper_get_psus_presence(x) == False:
+        if _wrapper_get_psu_presence(x) == False:
            Psu_removed = True
            cmd = "cat /var/log/syslog | grep -c -i " + "'" + "PSU " + str(x+1) + " .*is not present." + "'"
            pin = subprocess.Popen(cmd,
