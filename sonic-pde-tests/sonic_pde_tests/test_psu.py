@@ -21,11 +21,11 @@ def _wrapper_init():
        except Exception as e:
            print("Failed to load chassis due to {}".format(repr(e)))
 
-def _wrapper_get_num_psu():
+def _wrapper_get_num_psus():
     _wrapper_init()
     if platform_chassis is not None:
        try:
-           return platform_chassis.get_num_psu()
+           return platform_chassis.get_num_psus()
        except NotImplementedError:
            pass
 
@@ -140,7 +140,7 @@ def test_for_num_psus(json_config_data):
             }
         }
         """
-    assert _wrapper_get_num_psu() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} psu are supported in platform".format(_wrapper_get_num_psu())
+    assert _wrapper_get_num_psus() == json_config_data['PLATFORM']['num_psus'],"System plugin reports that {} psu are supported in platform".format(_wrapper_get_num_psus())
 
 def test_for_psu_present(json_config_data, json_test_data):
     """Test Purpose:  Test Purpose: Verify that the PSUs that are present report as present in the PSU plugin.
@@ -191,7 +191,7 @@ def test_for_psu_notpresent(json_config_data, json_test_data):
        }
 
     """
-    num_psus = _wrapper_get_num_psu()
+    num_psus = _wrapper_get_num_psus()
     for key in json_config_data:
         for x in range (1, num_psus):
             if _wrapper_get_psu_presence(x-1) == True:
