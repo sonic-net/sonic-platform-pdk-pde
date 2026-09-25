@@ -12,6 +12,7 @@
 #define _SAI_API_ID_MIN       (SAI_API_UNSPECIFIED + 1)
 #define _SAI_API_ID_MAX       SAI_API_BRIDGE
 #define _SAI_MAX_PORTS        512 /* max. number of front panel ports */
+#define _SAI_MAX_LANES        1024 /* max. physical lane (port) number */
 #define _SAI_PROFILE_MAX_KVPS 64  /* max. number of KVP */
 #define COUNTOF(x)            (sizeof(x) / sizeof((x)[0]))
 #define TRUE                  1
@@ -41,7 +42,7 @@ uint32_t g_switch_l2p[_SAI_MAX_PORTS];
  * SAI: Mapping lane to port
  * BCM: Mapping physical port to logical port
  */
-sai_object_id_t g_switch_p2l[_SAI_MAX_PORTS];
+sai_object_id_t g_switch_p2l[_SAI_MAX_LANES];
 
 typedef struct _profile_kvp_s
 {
@@ -569,7 +570,18 @@ sai_status_t switchInitialize(const char *mac)
         }
         /* logical port to physical port */
         g_switch_l2p[g_switch_ports[i] & 0x1ff] = lanes[0];
-        g_switch_p2l[lanes[0]] = g_switch_ports[i];
+        /* physical port to logical port: lane numbers can exceed the
+         * front panel port count (e.g. out-of-band service ports), so
+         * bound the index rather than write past the table */
+        if (lanes[0] < COUNTOF(g_switch_p2l))
+        {
+            g_switch_p2l[lanes[0]] = g_switch_ports[i];
+        }
+        else
+        {
+            printf("port 0x%lx: lane %u exceeds the lane table (%u)\n",
+                   g_switch_ports[i], lanes[0], (unsigned)COUNTOF(g_switch_p2l));
+        }
     }
 
     return SAI_STATUS_SUCCESS;
