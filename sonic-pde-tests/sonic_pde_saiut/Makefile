@@ -4,9 +4,9 @@ SAI_LIB := /usr/lib
 
 PYTHON_CFLAGS := $(shell python3-config --includes)
 CC      := gcc
-CFLAGS  := -fPIC $(PYTHON_CFLAGS) -I$(SAI_INC) -I$(SAI_INC)/experimental
+CFLAGS  += -fPIC $(PYTHON_CFLAGS) -I$(SAI_INC) -I$(SAI_INC)/experimental
 
-LDFLAGS := -L$(SAI_LIB) -lsai
+LDFLAGS += -L$(SAI_LIB) -lsai
 
 all: _saiut.so
 
